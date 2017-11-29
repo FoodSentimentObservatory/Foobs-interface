@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link  rel="stylesheet" href="/static/css/bootstrap.css" type="text/css"/>
+    <link  rel="stylesheet" href="/static/css/styles.css" type="text/css"/>
+    <link  rel="stylesheet" href="/static/css/newStyles.css" type="text/css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src = "/static/js/bootstrap.min.js"></script>
+
+  </head>
+
+  <body>
+    <nav class="navbar navbar-inverse">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Food Sentiment Observatory</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li><a href="/index">Home</a></li>
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Search Types
+            <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="#">All keywords</a></li>
+              <li><a href="#">Select specific keywords</a></li>
+            </ul>
+          </li>
+          <li class="active"><a href="/manual">Manual</a></li>
+        </ul>
+      </div>
+    </nav> 
+    <div class="container" id="mainContainer">
+    <h2>A brief walk-though how to use the system</h2>
+    <ul class="list-group">
+      <li class="list-group-item"><h3>1. Get to the home page</h3>
+      <p>There you'll see three groups of input to specify:</p>
+      <div class="unstyled">
+      <ul> 
+        <li><span class="glyphicon glyphicon-menu-right"></span> Search type (currently only the middle option available)</li>
+        <li><span class="glyphicon glyphicon-menu-right"></span> Choose sprint - select a discourse from the dropdown menu. Once you click on it, you will also see some additional information about the search to help you decide.</li>
+      </ul></div>
+      </li>
+    
+    <li class="list-group-item">  
+    <h3>2. Specify keyword groups</h3>
+      <p>The results will need to contain either all words from one group or from another</p>
+      <p>When typing words, you'll get autosuggested keywords and phrases from the selected search, however, you can pick your own as well.</p>
+      <p>You can also specify a time range for your search. By default the time range is the whole search period for the selected discourse.</p>
+      <p>Note: Please keep in mind that each tweet has a limited amount of characters, so the
+      more words a group has, the less likely it is to return a lot of results</p></li>
+    <li class="list-group-item">  
+    <h3>3. Examine results</h3>
+      <p>Each group results come with their own basic statistics</p>
+      <p>If you click on a word from the frequent word section, you'll get all the tweets
+      from the current group results containing that word. You can continue doing this until
+      you get to a point where the frequent word generated, show the same results. This means
+      you've reached the end of the rabbit hole and you've ended up with one tweet or a group of retweets.</p></li> 
+    </ul>   
+    </div>
+      <footer class="footer" id="footerId">
+      <div class="container"> 
+        
+      </div>
+    </footer>
+  </body>
+</html>  
