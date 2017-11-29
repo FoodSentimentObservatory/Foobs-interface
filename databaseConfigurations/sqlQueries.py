@@ -1,4 +1,4 @@
-import config
+import databaseConfigurations.config as config
 import pymssql
 #connecting to database
 def connectionToDatabaseTest(dbName):

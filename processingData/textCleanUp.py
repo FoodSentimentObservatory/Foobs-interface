@@ -5,8 +5,7 @@ from spacy import en
 import sys
 import os
 from operator import itemgetter
-import fileFunctions
-import spacyStopWords
+import processingData.spacyStopWords as spacyStopWords
 from itertools import groupby
 
 nlp = spacy.load("en")

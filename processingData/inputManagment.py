@@ -1,8 +1,8 @@
-import sqlQueries
-import config
+import databaseConfigurations.sqlQueries as sqlQueries
+import databaseConfigurations.config as config
 import html
 import re
-import textCleanUp
+import processingData.textCleanUp as textCleanUp
 import json
 
 def fetchingTweetsContainingGroups(cursor,location,searchQuery,listOfGroups, fromDate, toDate):

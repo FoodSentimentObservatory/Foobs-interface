@@ -1,17 +1,17 @@
 import cherrypy
-import sqlQueries
-import inputManagment
+import databaseConfigurations.sqlQueries as sqlQueries
+import processingData.inputManagment as inputManagment
 import os
 from Cheetah.Template import Template
 import datetime
-import textCleanUp
+import processingData.textCleanUp as textCleanUp
 import re
 from jinja2 import Environment, FileSystemLoader
 from itertools import groupby
 import html
 import collections
-import fileFunctions
-import testScatterText
+import processingData.fileFunctions as fileFunctions
+import visualisations.testScatterText as testScatterText
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 env=Environment(loader=FileSystemLoader(CUR_DIR),
@@ -28,14 +28,13 @@ class ServerConnection(object):
 		searchNotesDic = inputManagment.getSearchNotes()
 		listOfAllCollections = inputManagment.getCollectionsFromAllDbs()
 
-		template = env.get_template('interfaces/index.html')
+		template = env.get_template('GUI/index.html')
 		#sending the tweets and the group data to html
 		return template.render(dicw=searchNotesDic, listOfDatabases=listOfDatabases, title="something", listOfAllCollections=listOfAllCollections)
-		#eturn open('interfaces/index.html')
 
 	@cherrypy.expose
 	def manual(self):
-		return open('interfaces/manual.html')	
+		return open('GUI/manual.html')	
 	
 	#direct towards the relevant script
 	@cherrypy.expose
@@ -45,7 +44,7 @@ class ServerConnection(object):
 		self.dbName = dbName
 		self.startDate = start
 		self.endof = endof
-		template = env.get_template('interfaces/keywordSearch.html')
+		template = env.get_template('GUI/keywordSearch.html')
 		#sending the tweets and the group data to html
 		return template.render(startDate=self.startDate, endDate=self.endof, title="something")
  	
@@ -106,7 +105,7 @@ class ServerConnection(object):
 				index=5
 				dicw = textCleanUp.dictionaryGen(tweetList,index)
 
-			template = env.get_template('interfaces/results.html')
+			template = env.get_template('GUI/results.html')
 			conn.close()
 			#sending the tweets and the group data to html
 			return template.render(dicw=dicw, listOfCollections=listOfCollections, groupList=groupList, i=0)
@@ -174,7 +173,7 @@ class ServerConnection(object):
 			groupList.append(groupTup)
 			i+=1
 
-		template = env.get_template('interfaces/freqResults.html')
+		template = env.get_template('GUI/freqResults.html')
 		#sending the tweets and the group data to html
 		return template.render(dicw=od, groupOriginalName=groupOriginalName, groupList=groupList, word=word)	
 
@@ -205,7 +204,7 @@ class ServerConnection(object):
 		conn.close()
 		print(collectionsList)
 
-		template = env.get_template('interfaces/collectionsPage.html')
+		template = env.get_template('GUI/collectionsPage.html')
 		#sending the tweets and the group data to html
 		return template.render(collectionsList=collectionsList,paramsList=paramsList)
 	@cherrypy.expose	
@@ -222,7 +221,7 @@ class ServerConnection(object):
 
 		conn.close()
 
-		template = env.get_template('interfaces/collectionsPage.html')
+		template = env.get_template('GUI/collectionsPage.html')
 		#sending the tweets and the group data to html
 		return template.render(collectionsList=collectionsList, paramsList=paramsList)
 
@@ -250,7 +249,7 @@ class ServerConnection(object):
 		paramsList = textCleanUp.makeAStringOfKeywordGroups(parametersDictionary)
 		conn.close()
 
-		template = env.get_template('interfaces/collectionsPage.html')
+		template = env.get_template('GUI/collectionsPage.html')
 		#sending the tweets and the group data to html
 		return template.render(collectionsList=collectionsList,paramsList=paramsList)	
 	
@@ -269,7 +268,7 @@ class ServerConnection(object):
 		paramsList = textCleanUp.makeAStringOfKeywordGroups(parametersDictionary)
 		conn.close()
 
-		template = env.get_template('interfaces/collectionsPage.html')
+		template = env.get_template('GUI/collectionsPage.html')
 		#sending the tweets and the group data to html
 		return template.render(collectionsList=collectionsList,paramsList=paramsList)	
 
@@ -302,7 +301,7 @@ class ServerConnection(object):
 			index = 5
 			collectionDictionary = textCleanUp.dictionaryGen(tweetL,index)
 			
-			template = env.get_template('interfaces/displayCollection.html')
+			template = env.get_template('GUI/displayCollection.html')
 			#sending the tweets and the group data to html
 			return template.render(groupOfParameters=groupOfParameters, collectionDictionary=collectionDictionary, collectionName=collectionName)	
 
@@ -360,7 +359,7 @@ if __name__ == '__main__':
 		},
 		'/static': {
 			'tools.staticdir.on': True,
-			'tools.staticdir.dir': './public'
+			'tools.staticdir.dir': './GUI/public'
 		}
 	}
 

@@ -1,5 +1,4 @@
 import sys
-import config
 import re
 import json
 #function to generate a json format data of the tweets for scattertext
