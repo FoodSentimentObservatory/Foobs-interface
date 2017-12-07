@@ -39,7 +39,6 @@ def frequencyCount(tweets, group):
         if count > 1:
                     repeatedWordsTuple = (str(count), words.lower())
                     repeatedWords.append(repeatedWordsTuple)
-
         else:
                     uniqueWords.append(words.lower())
     print("Generated frequencies for current group") 

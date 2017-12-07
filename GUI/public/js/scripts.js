@@ -428,7 +428,11 @@ function setCollectionDateForEdit(name, description, collectionId, collectionDbI
 function setCollectionId(collectionId){
 	document.getElementById('collectionToDeleteId').value = collectionId;
 };
-
+function setCollectionIdForTopics(){
+	var collectionSelection = document.getElementById("listOfCollectionsForTopics");
+	var collectionStr = collectionSelection.options[collectionSelection.selectedIndex].value;
+	document.getElementById('collectionIdToShow').value = collectionStr;
+};
 //Function to check if two selections have been made; if so
 //disable other selections and get the unique id values of
 //the two selections for visualisation
@@ -531,3 +535,10 @@ function selectCollectionDataToBeShown(){
 	selectDataToBeShown(database,notDatabase);
 }
 $('.panel-title a').collapse();
+
+$(document).ready(function() {
+    $('.dropdown-menu li a').click(function(event) {
+        var option = $(event.target).text();
+        $(event.target).parents('.btn-group').find('.dropdown-toggle').html(option+' <span class="caret"></span>');
+    });
+});

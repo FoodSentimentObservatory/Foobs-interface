@@ -373,3 +373,8 @@ ul.ui-autocomplete {
 .setVisibility{
 	display: none;
 }
+
+.topicDivs{
+	margin-top: 2px;
+	padding-top: 2px;
+}

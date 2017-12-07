@@ -1,8 +1,14 @@
 [db-data]
-port = 1066
-server = localhost
+port = 
+server = 
 
 [db-names]
 sprintOne = 
 sprintTwo = 
 sprintTwoExperimentThree = 
+
+[jst-data]
+dataFile =
+trainingPropertiesFile = 
+jstExe=
+jstFinalTwords=

@@ -138,8 +138,11 @@ def getCollectionName (cursor, uniqueId):
     cursor.execute("SELECT [CollectionName] FROM [Collections] WHERE [uniqueIdentifier] = '"+uniqueId+"'")  
 
     collectionName = cursor.fetchall()
-    collectionNameStr = collectionName[0][0]
-
+    if len(collectionName)>0:
+        collectionNameStr = collectionName[0][0]
+    else:    
+        collectionNameStr=""
+        
     return collectionNameStr  
 #saves query parameters to database
 def saveQueryParameters(cursor, collectionId, keywords, searchQuery, location, fromDate, toDate):
@@ -165,7 +168,10 @@ def getCollectionId (cursor, collectionUniqueId):
     cursor.execute("SELECT TOP 1 [Id], [uniqueIdentifier] FROM [Collections] WHERE [Collections].[uniqueIdentifier] = '"+collectionUniqueId+"'")
 
     collection = cursor.fetchall()
-    collectionId= collection[0][0]
+    if len(collection)>0:
+        collectionId= collection[0][0]
+    else:
+        collectionId=1    
 
     return collectionId    
 

@@ -13,27 +13,19 @@
   <body>
     <div class="se-pre-con"></div>
     
-    <nav class="navbar navbar-inverse">
+      <nav class="navbar navbar-inverse">
       <div class="container">
         <div class="navbar-header">
           <a class="navbar-brand" href="#">Food Sentiment Observatory</a>
         </div>
         <ul class="nav navbar-nav">
           <li><a href="/index">Home</a></li>
-          <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Searches
-            <span class="caret"></span></a>
-            <ul class="dropdown-menu">
-              <li><a href="#">List of</a></li>
-              <li><a href="#">Searches</a></li>
-              <li><a href="#">For that sprint</a></li>
-            </ul>
-          </li>
           <li><a href="/manual">Manual</a></li>
-          <li><a href="/collectionsPage">Collections</a></li>
+          <li> <a href="/collectionsPage">Collections</a></li>
+          <li><a href="/topicVisualisationHomePage">Topic Visualisation</a></li>
         </ul>
       </div>
-    </nav> 
+    </nav>  
     <div class="container" id="mainContainer">
     
     <div class="col-sm-12" id="whitie">
@@ -67,7 +59,6 @@
               {% if group[3] > 0 %}
               <form role="form" autocomplete="off" action = "/frequentKeywordSearch">
                 <input type="hidden" name="groupIdStr" value="{{group[0]}}">
-                <input type="hidden" name="indexing" id="{{group[2]}}" value="">
                 {% if group[2] == 0 %}
                 <input type="hidden" name="groupOriginalName" id="groupOriginalName" value="{{group[1]}}">
                 {% else %}
@@ -138,13 +129,15 @@
           <div class="modal-body" onload= "giveUniqueId()">
           <form action = "/saveCollection">
             <select class="form-control nav" id="listOfCollections" onchange="changeValues()">
-            <option value="" disabled selected>Select a collection</option>
-            <option disabled>______________________________________________</option>
+            <option value="" disabled selected>Select an option</option>
+            <optgroup label="Create new">
             <option value="" >Create new collection</option>
-            <option disabled>______________________________________________</option>
+            </optgroup>
+            <optgroup label="Select from existing collections">
               {% for collection in listOfCollections %}
                 <option value="{{collection[1]+'|'+collection[3]+'|'+collection[2]}}" >{{collection[3]}}</option>
               {% endfor %}  
+            </optgroup>
             </select>
             <input type="hidden" name="collectionId" id="collectionId" value="">
             <h5>Name:</h5>
