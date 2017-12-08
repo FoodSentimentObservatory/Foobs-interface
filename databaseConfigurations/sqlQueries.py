@@ -67,7 +67,7 @@ def getCount(cursor, queryString,location):
 
     count = cursor.fetchall()
 
-    return count
+    return count[0][0]
 #get the coordinates of a search
 def getLocationOfSearch(cursor, queryString, location):
     cursor.execute("SELECT Distinct [Search].[radius], [GeoPoint].[latitude], [GeoPoint].[longitude] FROM Search INNER JOIN GeoPoint ON [Search].[LocationId]=[GeoPoint].[locationId] WHERE Search.Note like '%"+queryString+"%' AND Search.Note like '%"+location+"%'")    
@@ -81,14 +81,14 @@ def getFirstSearchDate(cursor,queryString,location):
 
     firstSearch = cursor.fetchall()
 
-    return firstSearch
+    return firstSearch[0][0]
 #get the last search date
 def getLastSearchDate(cursor,queryString,location):
     cursor.execute("SELECT TOP 1 [Search].[endOfSearch] FROM [Search] WHERE [Search].[Note] LIKE '%"+queryString+"%' AND [Search].[Note] LIKE '%"+location+"%' ORDER BY [Search].[endOfSearch] DESC")
 
     lastSearchDate = cursor.fetchall()
 
-    return lastSearchDate    
+    return lastSearchDate[0][0]    
 #count the times searches for a given discourse have been performed
 def getCountOfSearches(cursor, queryString, location):
     cursor.execute("SELECT  COUNT(*) FROM\
@@ -98,7 +98,7 @@ def getCountOfSearches(cursor, queryString, location):
 
     countOfSearches = cursor.fetchall()
 
-    return countOfSearches   
+    return countOfSearches[0][0]   
 #fetch all the existing collections from the database
 def getExistingCollections(cursor):
     cursor.execute("SELECT * FROM [Collections]")   

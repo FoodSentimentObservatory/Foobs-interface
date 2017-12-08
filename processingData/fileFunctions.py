@@ -2,7 +2,7 @@ import sys
 import re
 import json
 import databaseConfigurations.config as config
-import processingData.textCleanUp as textCleanUp
+import processingData.resultsFiltering as resultsFiltering
 #function to generate a json format data of the tweets for scattertext
 def generateJson(listOfDataForVis):
     
@@ -64,6 +64,6 @@ def readJSTResultFiles():
 	with open(path,"r") as f:
 		lines = f.readlines()
 		for line in lines:
-			#cleanLine = textCleanUp.extraCharRemoval(line, charList,check)
+			#cleanLine = resultsFiltering.extraCharRemoval(line, charList,check)
 			print(line)
 		#print (repr(f.read()))	           

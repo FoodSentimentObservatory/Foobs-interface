@@ -1,27 +1,28 @@
 import databaseConfigurations.sqlQueries as sqlQueries
-import processingData.inputManagment as inputManagment
-import processingData.textCleanUp as textCleanUp
+import DataManager.collectionsDataManager as collectionsDataManager
+import DataManager.tweetsDataManager as tweetsDataManager
+import processingData.resultsFiltering as resultsFiltering
 import processingData.fileFunctions as fileFunctions
-import visualisations.testScatterText as testScatterText
+import Analysis.testScatterText as testScatterText
 
 class Collection():
 
 	def __init__(self, collectionId, cursor):
 		self.collectionId = collectionId
 		self.cursor = cursor
-		self.idOfCollection = sqlQueries.getCollectionId(self.cursor,self.collectionId)
+		self.idOfCollection = collectionsDataManager.getCollectionId(self.cursor,self.collectionId)
 		self.groupOfParameters = []
-		self.collectionName = sqlQueries.getCollectionName(cursor, str(self.collectionId))
+		self.collectionName = collectionsDataManager.getCollectionName(cursor, str(self.collectionId))
 
 	def saveCollection(self, collectionName, collectionDescription, dateOfCreation, groupOfKeywords, searchQuery, location, fromDate, toDate):
-		checkIfExists = sqlQueries.searchForUniqueId(self.cursor,self.collectionId)
+		checkIfExists = collectionsDataManager.searchForCollection(self.cursor,self.collectionId)
 		if len(checkIfExists)>0:
-			sqlQueries.updateCollectionEntry(self.cursor, self.collectionId, collectionName, collectionDescription,dateOfCreation)
+			collectionsDataManager.updateExistingCollection(self.cursor, self.collectionId, collectionName, collectionDescription,dateOfCreation)
 		else:
-			sqlQueries.createANewCollectionEntry(self.cursor, self.collectionId, collectionName, collectionDescription,dateOfCreation)	
+			collectionsDataManager.createNewCollection(self.cursor, self.collectionId, collectionName, collectionDescription,dateOfCreation)	
 
-		self.idOfCollection = sqlQueries.getCollectionId(self.cursor,self.collectionId)
-		sqlQueries.saveQueryParameters(self.cursor, self.idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate)	
+		self.idOfCollection = collectionsDataManager.getCollectionId(self.cursor,self.collectionId)
+		collectionsDataManager.saveCollectionParameters(self.cursor, self.idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate)	
 
 	def updateCollection(self, collectionId, timeStamp, nameOfProject, descriptionOfProject,keywordGroups):
 			if len(keywordGroups)>0:
@@ -32,16 +33,16 @@ class Collection():
 			
 				for group in listOfKeywordGroups:
 					print(str(group))
-					sqlQueries.deleteASpecificParameter(cursor, str(self.idOfCollection), group)
+					collectionsDataManager.deleteASpecificParameter(self.cursor, str(self.idOfCollection), group)
 
-			sqlQueries.updateCollectionEntry(cursor, collectionId, nameOfProject, descriptionOfProject,timeStamp)
+			collectionsDataManager.updateExistingCollection(self.cursor, self.collectionId, nameOfProject, descriptionOfProject,timeStamp)
 
 	def deleteACollection(self):
-		sqlQueries.deleteAllParametersOfACollection(self.cursor, str(self.idOfCollection))	
-		sqlQueries.deleteCollectionEntry(self.cursor, self.collectionId)	
+		collectionsDataManager.deleteAllParametersOfACollection(self.cursor, str(self.idOfCollection))	
+		collectionsDataManager.deleteCollectionEntry(self.cursor, self.collectionId)	
 
 	def showACollection(self):
-		listOfCollectionParameters = sqlQueries.getParametersOfCollection(self.cursor, str(self.idOfCollection))
+		listOfCollectionParameters = collectionsDataManager.getParametersOfCollection(self.cursor, str(self.idOfCollection))
 
 		tweets=[]
 		i=0
@@ -49,7 +50,7 @@ class Collection():
 			listOfKeywords = parameter[1].split(',')
 			listOfListOfKeywords = []
 			listOfListOfKeywords.append(listOfKeywords)
-			tweetsFromGroup=inputManagment.fetchingTweetsContainingGroups(self.cursor,parameter[3],parameter[2],listOfListOfKeywords, parameter[4], parameter[5])
+			tweetsFromGroup=tweetsDataManager.fetchingTweetsContainingGroups(self.cursor,parameter[3],parameter[2],listOfListOfKeywords, parameter[4], parameter[5])
 			numberOfTweets = len(tweetsFromGroup[0])
 			noCommaGroupOfTweets = parameter[1].replace(",","")
 			parameterData = [noCommaGroupOfTweets, parameter[1],i ,parameter[2], parameter[3], parameter[4], parameter[5], numberOfTweets]
@@ -60,20 +61,20 @@ class Collection():
 		tweetL = [tweet for sublist in tweetList for tweet in sublist]	
 			
 		index = 5
-		collectionDictionary = textCleanUp.dictionaryGen(tweetL,index)
+		collectionDictionary = resultsFiltering.dictionaryGen(tweetL,index)
 
 		return collectionDictionary
 
 	def getAllCollections(self):
-		collectionsList=sqlQueries.getExistingCollections(self.cursor)
+		collectionsList=collectionsDataManager.getExistingCollections(self.cursor)
 
 		return collectionsList
 
 	def getAllParameters(self):
-		listOfAllParameters = sqlQueries.getAllCollectionParameters(self.cursor)
+		listOfAllParameters = collectionsDataManager.getAllCollectionParameters(self.cursor)
 		index=1
-		parametersDictionary = textCleanUp.dictionaryGen(listOfAllParameters, index)
-		paramsList = textCleanUp.makeAStringOfKeywordGroups(parametersDictionary)
+		parametersDictionary = resultsFiltering.dictionaryGen(listOfAllParameters, index)
+		paramsList = resultsFiltering.makeAStringOfKeywordGroups(parametersDictionary)
 		print(paramsList)
 
 		return paramsList	

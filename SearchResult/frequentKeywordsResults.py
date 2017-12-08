@@ -1,5 +1,6 @@
 import collections
-import processingData.textCleanUp as textCleanUp
+import processingData.resultsFiltering as resultsFiltering
+import Analysis.frequencyCount as frequencyCount
 import html
 
 class FrequentKeywordsResult:
@@ -21,11 +22,11 @@ class FrequentKeywordsResult:
 		for tweet in tweetsList:
 			charList=['[[',']]','\n']
 			check=1
-			cleanTweet=textCleanUp.extraCharRemoval(tweet, charList,check)
+			cleanTweet=resultsFiltering.extraCharRemoval(tweet, charList,check)
 			tweetData = cleanTweet.split("', '")
 			text=html.escape(tweetData[0],quote=True)
 			displayName = html.escape(tweetData[4],quote=True)
-			newText = textCleanUp.clickableLinks(text)
+			newText = resultsFiltering.clickableLinks(text)
 			#making two lists, one that will be used for content and one for the hidden input field
 			#difference is that the one for the hidden field doesn't contain html tags
 			dataWithNoHtmlTags = [text,tweetData[1],tweetData[2],tweetData[3],displayName]
@@ -39,7 +40,7 @@ class FrequentKeywordsResult:
 		self.tweetDataList = self.splitIntoTweetList()
 		for tweet in self.tweetDataList:
 			if self.word in tweet[0].lower():
-				textCleanUp.addTweetToNewGroupsList(self.word,tweet,self.originalStringGroupId,self.newGroups)				
+				resultsFiltering.addTweetToNewGroupsList(self.word,tweet,self.originalStringGroupId,self.newGroups)				
 
 	def splitIntoGroupList(self):		
 		#splitting the freqword str into a list
@@ -48,7 +49,7 @@ class FrequentKeywordsResult:
 		for groups in groupOfFrequentWordsList:
 			charList=['\'','[',']','(',')']
 			check=0
-			groups=textCleanUp.extraCharRemoval(groups, charList,check)
+			groups=resultsFiltering.extraCharRemoval(groups, charList,check)
 			groupTup = groups.split(", ")		
 			cleanGroupList.append(groupTup[1])
 
@@ -61,14 +62,14 @@ class FrequentKeywordsResult:
 			if freqWord!=self.word:
 				for tweet in self.tweetDataList:
 					if freqWord in tweet[0].lower():
-						textCleanUp.addTweetToNewGroupsList(freqWord,tweet,self.originalStringGroupId,self.newGroups)
+						resultsFiltering.addTweetToNewGroupsList(freqWord,tweet,self.originalStringGroupId,self.newGroups)
 
 	def returnDictionaryOfTweets(self):		
 		self.findTweetsContainingSelectedWord()
 		self.findTweetsForTheOtherFrequentWords()		
 		#making a dictionary by frequent word				
 		index=5
-		freqWordTweetsDict = textCleanUp.dictionaryGen(self.newGroups,index)
+		freqWordTweetsDict = resultsFiltering.dictionaryGen(self.newGroups,index)
 		self.orderedFreqKeywordTweetDict = collections.OrderedDict(sorted(freqWordTweetsDict.items()))
 
 		return self.orderedFreqKeywordTweetDict	
@@ -80,7 +81,7 @@ class FrequentKeywordsResult:
 			numberOfTweets=len(value)
 			groupId=self.originalStringGroupId+key
 			groupString=self.originalGroupName+","+key
-			frequentWords = textCleanUp.frequencyCount(value,groupString)
+			frequentWords = frequencyCount.frequencyCount(value,groupString)
 			listForInputValues=[]
 			for tweet in self.tweetDataListNoHtmlTags:
 				if key in tweet[0].lower():

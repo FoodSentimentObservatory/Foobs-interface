@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import json
 import databaseConfigurations.sqlQueries as sqlQueries
-import processingData.inputManagment as inputManagment
+import DataManager.tweetsDataManager as tweetsDataManager
 import processingData.fileFunctions as fileFunctions
 
 def visualiseCollections(cursor, twoCollectionId):
@@ -26,7 +26,7 @@ def visualiseCollections(cursor, twoCollectionId):
 			listOfKeywords = parameter[1].split(',')
 			listOfListOfKeywords = []
 			listOfListOfKeywords.append(listOfKeywords)
-			tweetsFromGroup=inputManagment.fetchingTweetsContainingGroups(cursor,parameter[3],parameter[2],listOfListOfKeywords, parameter[4], parameter[5])	
+			tweetsFromGroup=tweetsDataManager.fetchingTweetsContainingGroups(cursor,parameter[3],parameter[2],listOfListOfKeywords, parameter[4], parameter[5])	
 			tweets.append(tweetsFromGroup)		
 
 		tweetList = [tweet for sublist in tweets for tweet in sublist]

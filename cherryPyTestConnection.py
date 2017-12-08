@@ -1,11 +1,11 @@
 import cherrypy
-import databaseConfigurations.sqlQueries as sqlQueries
-import processingData.inputManagment as inputManagment
+import DataManager.dataManager as dataManager
+import DataManager.collectionsDataManager as collectionsDataManager
 import os
 from jinja2 import Environment, FileSystemLoader
 import processingData.fileFunctions as fileFunctions
-import visualisations.testScatterText as testScatterText
-import visualisations.runJst as runJst
+import Analysis.testScatterText as testScatterText
+import Analysis.runJst as runJst
 import SearchResult.keywordSearch as keywordSearch
 import SearchResult.frequentKeywordsResults as frequentKeywordsResult
 import Collections.collections as collections
@@ -21,9 +21,9 @@ class ServerConnection(object):
 
 	@cherrypy.expose
 	def index(self):
-		listOfDatabases = inputManagment.getDBs() 
-		searchNotesDic = inputManagment.getSearchNotes()
-		listOfAllCollections = inputManagment.getCollectionsFromAllDbs()
+		listOfDatabases = dataManager.getDBs() 
+		searchNotesDic = dataManager.getSearchNotes()
+		listOfAllCollections = collectionsDataManager.getCollectionsFromAllDbs()
 
 		template = env.get_template('GUI/index.html')
 		#sending the tweets and the group data to html
@@ -81,7 +81,7 @@ class ServerConnection(object):
 		print (listOfCollectionData)	
 
 		self.dbName=dbName	
-		conn = sqlQueries.connectionToDatabaseTest(self.dbName)	
+		conn = dataManager.startDbConnection(self.dbName)	
 		cursor = conn.cursor()
 
 		collectionsObject = collections.Collection(collectionId,cursor)
@@ -97,7 +97,7 @@ class ServerConnection(object):
 		return template.render(collectionsList=collectionsList,paramsList=paramsList)
 	@cherrypy.expose	
 	def collectionsPage(self):
-		conn = sqlQueries.connectionToDatabaseTest(self.dbName)	
+		conn = dataManager.startDbConnection(self.dbName)	
 		cursor = conn.cursor()
 
 		collectionsObject = collections.Collection("S",cursor)
@@ -112,7 +112,7 @@ class ServerConnection(object):
 
 	@cherrypy.expose
 	def updateCollection(self, collectionId, timeStamp, nameOfProject, descriptionOfProject,keywordGroups):
-		conn = sqlQueries.connectionToDatabaseTest(self.dbName)	
+		conn = dataManager.startDbConnection(self.dbName)	
 		cursor = conn.cursor()
 		
 		collectionsObject = collections.Collection(collectionId,cursor)
@@ -129,7 +129,7 @@ class ServerConnection(object):
 	
 	@cherrypy.expose
 	def deleteCollection(self, collectionToDeleteId):
-		conn = sqlQueries.connectionToDatabaseTest(self.dbName)	
+		conn = dataManager.startDbConnection(self.dbName)	
 		cursor = conn.cursor()
 
 		collectionsObject = collections.Collection(collectionToDeleteId,cursor)		
@@ -146,7 +146,7 @@ class ServerConnection(object):
 
 	@cherrypy.expose	
 	def showCollection(self, collectionToShowId):
-		conn = sqlQueries.connectionToDatabaseTest(self.dbName)	
+		conn = dataManager.startDbConnection(self.dbName)	
 		cursor = conn.cursor()
 
 		collectionsObject = collections.Collection(collectionToShowId,cursor)	
@@ -173,20 +173,18 @@ class ServerConnection(object):
 
 	@cherrypy.expose	
 	def visualiseCollections(self, twoCollectionId):
-			conn = sqlQueries.connectionToDatabaseTest(self.dbName)	
-			cursor = conn.cursor()
-			print (twoCollectionId)	
-
+			conn = dataManager.startDbConnection(self.dbName)	
+			cursor = conn.cursor()	
 			html = testScatterText.visualiseCollections(cursor,twoCollectionId)
 			conn.close()
 			return html		
 
 	@cherrypy.expose
 	def topicVisualisationHomePage(self):
-		conn = sqlQueries.connectionToDatabaseTest(self.dbName)	
+		conn = dataManager.startDbConnection(self.dbName)	
 		cursor = conn.cursor()
 
-		collectionsList=sqlQueries.getExistingCollections(cursor)
+		collectionsList=collectionsDataManager.getExistingCollections(cursor)
 
 		conn.close()
 
@@ -196,13 +194,13 @@ class ServerConnection(object):
 
 	@cherrypy.expose							
 	def topicVisualisation(self, collectionIdToShow, numberOfTopics, numberOfTopicWords):
-		conn = sqlQueries.connectionToDatabaseTest(self.dbName)	
+		conn = dataManager.startDbConnection(self.dbName)	
 		cursor = conn.cursor()
 		print(collectionIdToShow)
 		print(numberOfTopics)
 		print(numberOfTopicWords)
 
-		visualisations.runJst(collectionIdToShow, numberOfTopics, numberOfTopicWords)
+		runJst.runJst(collectionIdToShow, numberOfTopics, numberOfTopicWords)
 
 		fileFunctions.readJSTResultFiles()
 

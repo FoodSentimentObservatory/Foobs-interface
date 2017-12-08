@@ -2,12 +2,13 @@ import subprocess
 import os
 import databaseConfigurations.config as config
 import databaseConfigurations.sqlQueries as sqlQueries
-import processingData.inputManagment as inputManagment
+import DataManager.dataManager as dataManager
 from spacy.attrs import ORTH
 from spacy import en
 import spacy
 import processingData.spacyStopWords as spacyStopWords
 import processingData.fileFunctions as fileFunctions
+import processingData.resultsFiltering as resultsFiltering
 
 nlp = spacy.load("en")
 spacyStopWords.stopWordsList(nlp)
@@ -24,7 +25,7 @@ def prepareJstData(collectionIdToShow, numberOfTopics, numberOfTopicWords):
 		listOfKeywords = parameter[1].split(',')
 		listOfListOfKeywords = []
 		listOfListOfKeywords.append(listOfKeywords)
-		tweetsFromGroup=inputManagment.fetchingTweetsContainingGroups(cursor,parameter[3],parameter[2],listOfListOfKeywords, parameter[4], parameter[5])
+		tweetsFromGroup=dataManager.fetchingTweetsContainingGroups(cursor,parameter[3],parameter[2],listOfListOfKeywords, parameter[4], parameter[5])
 		tweets.append(tweetsFromGroup)
 
 	tweetList = [tweet for sublist in tweets for tweet in sublist]
@@ -36,7 +37,7 @@ def prepareJstData(collectionIdToShow, numberOfTopics, numberOfTopicWords):
 		originalWordCountList.append(countTuple)
 		sentence = nlp(tweet[0])
 		cleanText = []
-		textCleanUp.textCleanup(cleanText, sentence)
+		resultsFiltering.resultsFiltering(cleanText, sentence)
 		tweetList = [tweet[0],tweet[1], cleanText, tweet[3]]
 		allTweetsCleaned.append(tweetList)
 

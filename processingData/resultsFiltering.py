@@ -7,50 +7,15 @@ import os
 from operator import itemgetter
 import processingData.spacyStopWords as spacyStopWords
 from itertools import groupby
+import html
 
-nlp = spacy.load("en")
-spacyStopWords.stopWordsList(nlp)
 #function to remove stop words, urls, punctuation, numbers and symbols using spacy. Goes through each tweet text and appends the result to two lists, one for the tweet and one for general statistics
 #removing also words like e.coli?
 def textCleanup(allWords,text):
     for word in text:
-                words =re.sub(r'@', "", str(word))
+                words = replaceChars('@', '', str(word))
                 if word.is_stop != True and word.like_url != True and word.is_punct !=True and word.like_num != True and words.isalpha()== True and len(words)> 1:
-                    allWords.append(words.lower())
-#does a frequency count of words across the whole corpus given to it using spacy and also generates a list of repeated words and unique words
-def frequencyCount(tweets, group):
-    allWords = []
-    repeatedWords=[]
-    uniqueWords=[]
-    for tweet in tweets:
-        text = tweet[0].lower()
-        sentence = nlp(text)
-        textCleanup(allWords, sentence)
-    allWordsStr = ' '.join(allWords)
-    doc = nlp(allWordsStr)
-    counts = doc.count_by(ORTH)
-    i = 0
-    #checks how many times each word appears in the whole word list and puts it either in repeated words or in unique words
-    for word_id, count in sorted(counts.items(), reverse=True, key=lambda item: item[1]):
-        words = nlp.vocab.strings[word_id]
-
-        frequencyTuple = (str(count), words.lower())
-        frequencyTupleStr = ' '.join(frequencyTuple)
-        if count > 1:
-                    repeatedWordsTuple = (str(count), words.lower())
-                    repeatedWords.append(repeatedWordsTuple)
-        else:
-                    uniqueWords.append(words.lower())
-    print("Generated frequencies for current group") 
-
-    n=0
-    topTen=[]
-    #removing the group keywords from that list because we clearly know they are frequent and select the top 10 remaining
-    for tup in repeatedWords:
-        if tup[1]not in group and n<15:
-            topTen.append(tup)
-            n+=1               
-    return topTen                
+                    allWords.append(words.lower())          
 
 #removes duplicating tweets (based on platfrom ID) and retweets*
 #* if we don't have the original tweet text, one retweet can get through the filtering..
@@ -70,7 +35,8 @@ def removeDupsAndRetweets(row, location):
             textList = text.split()
             textStrList = [word for word in textList if word.isalpha()]
             textStrRt = ' '.join(textStrList)
-            textStr = re.sub(r'rt','',textStrRt)
+            textStr = replaceChars("rt", '', textStrRt)
+            #textStr = re.sub(r'rt','',textStrRt)
             textStrStripped = textStr.strip()
             if textList[0]=="rt":
                 if textStrStripped in origTexts:
@@ -99,7 +65,7 @@ def clickableLinks(item):
 def extraCharRemoval(item, charList,check):
     for ch in charList:
         if ch in item:
-            item=item.replace(ch,"")
+            item=replaceChars(ch, "", item)
     if check==0:        
         itemS=item[1:]   
     elif check==1:
@@ -108,6 +74,11 @@ def extraCharRemoval(item, charList,check):
         itemS=item          
 
     return itemS
+
+def replaceChars(oldChar, newChar, text):
+    item=text.replace(oldChar,newChar)
+
+    return item
 
 def addTweetToNewGroupsList(word,tweet,groupIdStr,newGroups):
     groupId=groupIdStr+word
@@ -140,3 +111,32 @@ def makeAStringOfKeywordGroups(parametersDictionary):
             paramsList.append(paramsSublist)
 
         return paramsList    
+
+def removeHtmlChars(text):
+    textNoNewLines = replaceChars("\n", " ", text)
+    textNoHtmlChars=html.escape(textNoNewLines,quote=True)  
+
+    return  textNoHtmlChars    
+
+def findKeywordsInText(text, keywordGroup):
+    alreadySeenWords = []
+    count = 0
+    #for each word in the grop, checking if it exists in the text..
+    #if it does, one up the counter and search for the next word in the group
+    #if a word appears twice in tweet, we only count it once  
+    for word in keywordGroup:
+        regex = r'\b'+word+'\\b'
+        listL=re.findall(regex,text.lower())
+        if  len(listL)>0 and str(word) not in alreadySeenWords:
+            alreadySeenWords.append(word)
+            count+=1          
+
+    return count   
+
+def checkIfVerified(verifiedValue):
+    if verifiedValue==False:
+        verified="False"
+    elif verifiedValue==True:
+        verified="True"  
+
+    return verified            

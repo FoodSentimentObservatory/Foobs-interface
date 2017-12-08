@@ -1,6 +1,8 @@
 import databaseConfigurations.sqlQueries as sqlQueries
-import processingData.inputManagment as inputManagment
-import processingData.textCleanUp as textCleanUp
+import DataManager.dataManager as dataManager
+import processingData.resultsFiltering as resultsFiltering
+import DataManager.tweetsDataManager as tweetsDataManager
+import Analysis.frequencyCount as frequencyCount
 
 class SearchResult:		
 	def __init__(self, group,fromDate,toDate, dbName, location, searchQuery):
@@ -16,7 +18,7 @@ class SearchResult:
 		self.cursor = self.conn.cursor()
 
 	def startDbConnection(self):		
-		conn = sqlQueries.connectionToDatabaseTest(self.dbName)	
+		conn = dataManager.startDbConnection(self.dbName)	
 
 		return conn
 #retrieves all collections from db and passes it to controller		
@@ -39,7 +41,7 @@ class SearchResult:
 #a dictionary to the controller
 	def retrieveTweets(self):			
 		#getting all tweets with the specified keywords, the result is a list of lists, tweets are grouped in lists by keyword groups
-		self.tweets=inputManagment.fetchingTweetsContainingGroups(self.cursor,self.location,self.searchQuery,self.listOfGroups, self.fromDate, self.toDate)
+		self.tweets=tweetsDataManager.fetchingTweetsContainingGroups(self.cursor,self.location,self.searchQuery,self.listOfGroups, self.fromDate, self.toDate)
 		self.conn.close()
 		i=0
 		tweetList=[]
@@ -49,13 +51,13 @@ class SearchResult:
 			for tweet in groupOfTweets:
 				tweetL = list(tweet)
 				#making links clickable
-				text = textCleanUp.clickableLinks(tweetL[0])
+				text = resultsFiltering.clickableLinks(tweetL[0])
 				tweetL.append(text)
 				#sending the tweets to a list
 				tweetList.append(tweetL)
 
 		index=5
-		tweetDictionary = textCleanUp.dictionaryGen(tweetList,index)
+		tweetDictionary = resultsFiltering.dictionaryGen(tweetList,index)
 		return tweetDictionary
 #returns a list of keyword groups
 	def getGroupList(self):
@@ -65,7 +67,7 @@ class SearchResult:
 			numberOfTweets = len(groupOfTweets)
 			strGroupOfTweets = ','.join(self.listOfGroups[i])
 			print(strGroupOfTweets)
-			frequentWords = textCleanUp.frequencyCount(groupOfTweets,self.listOfGroups[i])
+			frequentWords = frequencyCount.frequencyCount(groupOfTweets,self.listOfGroups[i])
 			
 			noCommaGroupOfTweets = strGroupOfTweets.replace(',','')
 			groupTup = (noCommaGroupOfTweets, strGroupOfTweets,i,numberOfTweets,frequentWords, groupOfTweets)
