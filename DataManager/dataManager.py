@@ -47,7 +47,10 @@ def getSearchNotes():
     for note in noteList:
         idstr= "radio"+str(n)
         keywordListId ="keywordList"+str(n)
-        newNoteTup = (note[0],note[1],note[2],idstr, note[3],note[4],note[5],note[6], note[7], note[8],note[9],note[10],note[11],keywordListId)
+        clusterId = "cluster"+str(n)
+        keyId = note[3]+"_key"
+        clusterKeywordsId = "clusterKeyword"+str(n)
+        newNoteTup = (note[0],note[1],note[2],idstr, note[3],note[4],note[5],note[6], note[7], note[8],note[9],note[10],note[11],keywordListId,clusterId,keyId,clusterKeywordsId)
         newNoteList.append(newNoteTup)
         n+=1
     #creating a dictionary, key is the sprint    

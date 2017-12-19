@@ -13,9 +13,9 @@ import html
 #removing also words like e.coli?
 def textCleanup(allWords,text):
     for word in text:
-                words = replaceChars('@', '', str(word))
-                if word.is_stop != True and word.like_url != True and word.is_punct !=True and word.like_num != True and words.isalpha()== True and len(words)> 1:
-                    allWords.append(words.lower())          
+            words = replaceChars('@', '', str(word))
+            if word.is_stop != True and word.like_url != True and word.is_punct !=True and word.like_num != True and words.isalpha()== True and len(words)> 1:
+                allWords.append(words.lower())          
 
 #removes duplicating tweets (based on platfrom ID) and retweets*
 #* if we don't have the original tweet text, one retweet can get through the filtering..
@@ -36,7 +36,6 @@ def removeDupsAndRetweets(row, location):
             textStrList = [word for word in textList if word.isalpha()]
             textStrRt = ' '.join(textStrList)
             textStr = replaceChars("rt", '', textStrRt)
-            #textStr = re.sub(r'rt','',textStrRt)
             textStrStripped = textStr.strip()
             if textList[0]=="rt":
                 if textStrStripped in origTexts:
@@ -125,13 +124,20 @@ def findKeywordsInText(text, keywordGroup):
     #if it does, one up the counter and search for the next word in the group
     #if a word appears twice in tweet, we only count it once  
     for word in keywordGroup:
-        regex = r'\b'+word+'\\b'
-        listL=re.findall(regex,text.lower())
-        if  len(listL)>0 and str(word) not in alreadySeenWords:
-            alreadySeenWords.append(word)
-            count+=1          
-
+        checkIfExists = findWordInText(word, alreadySeenWords, text)
+        count += checkIfExists         
     return count   
+
+def findWordInText(word, alreadySeenWords, text):
+    count = 0
+    regex = r'\b'+word.strip()+'\\b'
+    listL=re.findall(regex,text.lower())
+ 
+    if  len(listL)>0 and str(word) not in alreadySeenWords:
+        alreadySeenWords.append(word)
+        count=1 
+  
+    return count         
 
 def checkIfVerified(verifiedValue):
     if verifiedValue==False:
@@ -139,4 +145,58 @@ def checkIfVerified(verifiedValue):
     elif verifiedValue==True:
         verified="True"  
 
-    return verified            
+    return verified   
+
+def splitStrOfGroups(group):
+    listOfGroups = []
+    if isinstance(group, str):
+        if (group != 'no groups'):
+            listofwords = group.split(",")
+            listOfGroups.append(listofwords)
+        else:
+            listOfGroups=['all tweets'] 
+    else:
+        for g in group:
+            singleGroup = g.split(",")
+            listOfGroups.append(singleGroup)
+
+    return listOfGroups            
+
+def addNewKeywordGroups(group, keywordsToCluster):    
+    newKeywordGroupList = []
+    keywordsToClusterList = keywordsToCluster.split(',')
+    print (keywordsToClusterList)
+    keywordsOfDataSet = splitStrOfGroups(group)
+    for keyword in keywordsToClusterList:
+        for word in keywordsOfDataSet:
+            newKeywordGroup = [keyword]
+            for w in word:
+                newKeywordGroup.append(w)
+            print(newKeywordGroup)
+            newKeywordGroupList.append(newKeywordGroup)
+
+    return newKeywordGroupList    
+
+def getKeywordContraintString(group):
+    listOfGroups = splitStrOfGroups(group)
+    intermediateListOfGroups = []
+    for g in listOfGroups:
+        gStr = ' AND '.join(g)
+        intermediateListOfGroups.append(gStr)
+
+    listOfGroupsStr = '; '.join(intermediateListOfGroups)
+
+    return listOfGroupsStr    
+
+def getTwitterLink(tweetId,userHandle):
+    twitterLink = "https://twitter.com/"+userHandle+"/status/"+str(tweetId)
+
+    return twitterLink    
+
+def createKeywordList(keywords, splitChar):
+    if isinstance(keywords, str):
+        keywordList = keywords.split(splitChar)
+    else:
+        keywordList=keywords 
+
+    return keywordList       

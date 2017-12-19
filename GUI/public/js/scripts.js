@@ -1,4 +1,5 @@
 var availableTags = [];
+var listOfTweets = [];
 function getKeywords(){
 	var keywordString = localStorage['objectToPass'];
 	//localStorage.clear();
@@ -19,7 +20,6 @@ $(function(){
 		//only matches to tags with the same starting letter   
 
 		$(".keywordGroup").find('input[type=text]:last').autocomplete({
-
 			source: function( request, response ) {
 				var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
 				response( $.grep( availableTags, function( item ){
@@ -27,7 +27,6 @@ $(function(){
 					}) );
 				}
 		});
-
 		newEntry.find('input').val('');
 		controlForm.find('.entry:not(:last) .btn-addSelection')
 			        .removeClass('btn-addSelection').addClass('btn-remove')
@@ -45,46 +44,17 @@ $(function(){
 //if no words have been added to a group and the user still tries to submit the group, an error message occurs	
 function postKeywords(){
 	var keyword = document.getElementsByName("kgroups")
-	var div = document.createElement("div");
-		div.style.width = "100%";					
-		div.style.background = "white";
-		div.style.color = "black";
-		div.style.border = "1px solid #E6E6FA";
-		div.style.borderRadius = "10px";
-		div.style.padding = "1em";
-		div.style.marginBottom = "1em";
+	var div = createAContainerForKeywords();
+		
 	var letters = /^[A-Za-z.-\s]+$/;
 	document.getElementById("check").value = "some groups";
 	document.getElementById("errorArea").innerHTML = ""
 	if (keyword[0].value.length>0){
-		var searchString=''
 		layout = '<div id="closeButton"><button type="button" class="close" aria-label="Close">\
- 			<span aria-hidden="true">&times;</span></button></div><div class="btn-group" data-toggle="buttons">'
- 		keywordLayout =""	
-		for (let i=0; i<keyword.length; i++){
-			if (keyword[i].value.length>0 ){
-				if (keyword[i].value.match(letters)){
-					keywordLayout+="<label class='btn btn-success active space'><input type='checkbox' \
-					name='groups' checked value="+keyword[i].value+">"+ keyword[i].value+"</label>";
-					if (/\s/.test(keyword[i].value)) {
-						var keywordPlus = keyword[i].value.replace(/\s/g,"+");
-						searchString += keywordPlus;
-					}else{
-						searchString +=keyword[i].value;
-					}						
-					if (i<keyword.length-1){
-						searchString+=",";
-					} 
-				} else {
-					keywordLayout = "<div class='alert alert-danger' role='alert'>Please, use only \
-					alphabetical characters, '.' or '-'</div>";
-					document.getElementById("check").value = "no groups";	
-					break;
-				}		
-			}
-		}
-		console.log(searchString);
-		layout = layout + keywordLayout + "<input type='hidden' name='group' value="+searchString+"></div>"
+ 			<span aria-hidden="true">&times;</span></button></div><div class="btn-group" data-toggle="buttons" style="width: 100%;">'
+		var listOfKeywordGroupEntities = createLabelsForKeywords(keyword, letters)
+		console.log(listOfKeywordGroupEntities[0]);
+		layout = layout + listOfKeywordGroupEntities[1] + "<input type='hidden' name='group' value="+listOfKeywordGroupEntities[0]+"></div>"
 		div.innerHTML = layout;
 		document.getElementById("errorMessageArea").innerHTML = "";
 		document.getElementById("keywordGroupShow").appendChild(div);
@@ -95,7 +65,21 @@ function postKeywords(){
 		return false;
 	}				
 };
-			// for the close button on each group bubble
+function createAContainerForKeywords(){
+	var div = document.createElement("div");
+		div.style.width = "100%";					
+		div.style.background = "white";
+		div.style.color = "black";
+		div.style.border = "1px solid #E6E6FA";
+		div.style.borderRadius = "10px";
+		div.style.padding = "1em";
+		div.style.marginBottom = "1em";
+		div.style.minHeight= '100px';
+		div.style.paddingBottom= '3em';
+
+	return div;	
+}
+// for the close button on each group bubble
 $('#keywordGroupShow').on('click', '.close', function(events){
 	$(this).parents('div').eq(1).remove();
 	document.getElementById("check").value="no groups";
@@ -120,14 +104,7 @@ function countCheckboxes(checkboxValueList){
 function validateForm()	{
 	var formAction = document.getElementById('searchSpecs').action;
 
-	var database = document.forms["searchSpecs"]["inputTypes"].value;
-	if (database == "") {
-		alertMessageDiv= "<div class='alert alert-danger' role='alert'><strong>Oh snap!</strong> \
-		You must select a search type</div>"
-		document.getElementById("searchTypes").innerHTML = alertMessageDiv;
-		return false;
-	}else{
-		if (formAction.match(/^.*connectToScript$/)){
+	if (formAction.match(/^.*connectToScript$/)){
 			var discourse = document.forms["searchSpecs"]["searchnoteID"].value;
 			if (discourse == ""){
 				alertMessageDiv= "<div class='alert alert-danger' role='alert'><strong>Oh snap!</strong> \
@@ -135,9 +112,20 @@ function validateForm()	{
 			    document.getElementById("searchDefs").innerHTML = alertMessageDiv;
 			    return false;
 			}
-		}else{
+	}else if(formAction.match(/^.*clusterFromDataSet$/)){
+			console.log('something')
+			return true;
+	}else if(formAction.match(/^.*clusterACollection$/)){
+			var collection = document.forms["searchSpecs"]["collectionId"].value;
+			if (collection==""){
+				alertMessageDiv= "<div class='alert alert-danger' role='alert'><strong>Oh snap!</strong> \
+			    You forgot to select a collection.</div>"
+			    document.getElementById("clusterCollectionError").innerHTML = alertMessageDiv;
+			    return false;
+			}
+	}else{
 			console.log("test");
-	console.log(formAction);
+			console.log(formAction);
 			var collections = document.getElementsByName('collectionRow');
 			var checkBoxData = countCheckboxes(collections);
 			var count = checkBoxData[0];
@@ -148,25 +136,33 @@ function validateForm()	{
 				document.getElementById("searchDefs").innerHTML = alertMessageDiv;
 				return false;
 			}else{
+				$('input[name="collectionRow"]').prop('disabled', true);
 				document.getElementById('twoCollectionId').value = vals;
+				loadingScreen()
+				
 			}
 		}
-	}
+	
 };
+function loadingScreen(){
+	$(".se-pre-con").show();
+    $("#whitie").hide();	
+}
 //checking if there are any groups specified, if not, throw an error
 function checkForGroups() {
 	var groups = document.forms["keywordGroupForm"]["check"].value;
 	console.log(groups);
-	if (groups == "no groups"){
+	if (groups == "display error"){
 		alertMessageDiv= "<div class='alert alert-danger' role='alert'><strong>Oh snap!</strong> \
-		You forgot to actually add any keyword groups :( </div>"
-		document.getElementById("errorArea").innerHTML = alertMessageDiv;
+		You forgot to add any keyword groups :( </div>"
+		//document.getElementById("errorArea").innerHTML = alertMessageDiv;
 		return false;
 	}else {
 		document.getElementById("check").value="no groups";
-		document.getElementById("errorArea").innerHTML = "";
+		//document.getElementById("errorArea").innerHTML = "";
 		$(".se-pre-con").show();
-        $("#mainContainer").hide(); 
+    	$("#mainContainer").hide(); 
+    	return true;
 	} 
 };
 //clear words from modal
@@ -187,11 +183,16 @@ $('#collectionsModal').on('hidden.bs.modal', function () {
 //loading gif for each page
 $(window).load(function() {
 	// Animate loader off screen
-	$(".se-pre-con").fadeOut("slow");;
+	$(".se-pre-con").fadeOut("slow");
 });
+$(window).bind("pageshow", function() {
+  $("#whitie").show();
+  $(".se-pre-con").fadeOut("slow");
+});
+	
 
 function setDb(dbName, notDbName){
-	$(".panel-collapse").collapse("hide");
+	$(".collapse").collapse("hide");
 	document.getElementById("dbName").value = dbName;
 	document.getElementById('notDbName').value = notDbName;
 	console.log(document.getElementById("dbName").value);
@@ -246,7 +247,7 @@ function displaySearchData(searchName,earliest,latest,keywordString, total, coor
 	console.log(document.getElementById("endof").value);
 		
 
-	layout = "<div id='info'><h4>"+searchName+"</h4><div class='tabbable-panel'><div class='tabbable-line'>\
+	layout = "<div class='info'><h4>"+searchName+"</h4><div class='tabbable-panel'><div class='tabbable-line'>\
 		<ul class='nav nav-tabs'><li class='active'><a href='#provenance' data-toggle='tab'>Provenance of the search </a></li>\
 		<li><a href='#dataQualities' data-toggle='tab'>Dataset information</a></li></ul>\
 		<div class='tab-content'><div class='tab-pane active' id='provenance'><strong>Start date of the search: </strong>"+firstSearch+"</br>\
@@ -262,7 +263,11 @@ function setLocalStorage(keywordsList){
 	var keyword = keywordsList;
     localStorage.setItem( 'objectToPass', keyword );
 };
+function setKeywordsCluster(keywords){
+	document.getElementById('keywordsCluster').value = keywords;
+	console.log(document.getElementById('keywordsCluster').value);
 	//function to create a json array for each point
+}
 function Coordinates(coordinatesData){
 	this.rad=coordinatesData[0];
 	this.center={};
@@ -460,7 +465,7 @@ function changeKeywords(keywordGroup){
 };
 //what data to be shown based on the databse selected, needs to be refined for the case of more dbs
 function selectDataToBeShown(database,notDatabase){
-	var x = document.forms["searchSpecs"]["inputTypes"].value;
+	var x = document.forms["dbSelect"]["inputTypes"].value;
 	var listOfNotDbs = notDatabase.split(";");
 //if the database has been selected, do the following	
 	if (x != ""){
@@ -503,24 +508,97 @@ function selectDataToBeShown(database,notDatabase){
 function changeFormAction(formAction){
 	if (formAction == 'filterKeywords'){
 		document.getElementById('searchSpecs').action="/connectToScript";
+			$('input[name="keywords"]').prop('disabled', false);
+			$('input[name="endof"]').prop('disabled', false);
+			$('input[name="start"]').prop('disabled', false);
+			$('input[name="twoCollectionId"]').prop('disabled', true);
+			$('input[name="collectionRow"]').prop('disabled', true);
+			$('input[name="keywordsCluster"]').prop('disabled', true);
+			$('input[name="searchnoteIDForCluster"]').prop('disabled', true);
+			$('input[name="searchnoteID"]').prop('disabled', false);
+			$('input[name="task"]').prop('disabled', false);
+		document.getElementById('task').value='/keywordSearch';	
+	}else if(formAction== 'selectCollection'){
+		document.getElementById('searchSpecs').action="/visualiseCollections";
+			$('input[name="keywords"]').prop('disabled', true);
+			$('input[name="endof"]').prop('disabled', true);
+			$('input[name="start"]').prop('disabled', true);
+			$('input[name="twoCollectionId"]').prop('disabled', false);
+			$('input[name="keywordsCluster"]').prop('disabled', true);
+			$('input[name="task"]').prop('disabled', true);
+			$('input[name="searchnoteIDForCluster"]').prop('disabled', true);
+			$('input[name="searchnoteID"]').prop('disabled', true);
+	}else if(formAction == 'clusterACollection'){
+		document.getElementById('searchSpecs').action="/clusterACollection";
+			$('input[name="keywords"]').prop('disabled', true);
+			$('input[name="endof"]').prop('disabled', true);
+			$('input[name="start"]').prop('disabled', true);
+			$('input[name="twoCollectionId"]').prop('disabled', true);
+			$('input[name="keywordsCluster"]').prop('disabled', true);
+			$('input[name="task"]').prop('disabled', true);
+			$('input[name="searchnoteIDForCluster"]').prop('disabled', true);
+			$('input[name="searchnoteID"]').prop('disabled', true);
 	}else{
-		document.getElementById('searchSpecs').action="/visualiseCollectionsFromIndexPage";
+		document.getElementById('searchSpecs').action="/clusterFromDataSet";
+			$('input[name="keywords"]').prop('disabled', true);
+			$('input[name="endof"]').prop('disabled', false);
+			$('input[name="start"]').prop('disabled', false);
+			$('input[name="keywordsCluster"]').prop('disabled', false);
+			$('input[name="twoCollectionId"]').prop('disabled', true);
+			$('input[name="searchnoteIDForCluster"]').prop('disabled', false);
+			$('input[name="task"]').prop('disabled', false);
+			$('input[name="searchnoteID"]').prop('disabled', true);
+			$('input[name="collectionRow"]').prop('disabled', true);
+		document.getElementById('task').value='/specifyClusterParams';	
 	}
 	console.log(document.getElementById('searchSpecs').action);
 };
 //for the filter keywords functionality
-function selectFilterKeywordDataToBeShown(){
-	var database = document.getElementById('dbName').value;
-	var notDatabase = document.getElementById('notDbName').value;
-	selectDataToBeShown(database,notDatabase);
-};
-//for the collection functionality
-function selectCollectionDataToBeShown(){
-	var database = document.getElementById('dbName').value + '_collection';
+function specifyTaskDataToBeShown(task){
+	if (task=='clusterDataset'){
+		var extention='_key';
+	}else if (task=='filter'){
+		var extention="";
+	}else if(task =='scat'){
+		var extention = "_collection";
+		document.getElementById('locationSpot').innerHTML="";
+		document.getElementById('map').style.visibility = 'hidden';
+		document.getElementById('searchData').innerHTML="";
+	}else{
+		var extention = "_collection_forCluster";
+		document.getElementById('locationSpot').innerHTML="";
+		document.getElementById('map').style.visibility = 'hidden';
+		document.getElementById('searchData').innerHTML="";
+	}
+	var database = document.getElementById('dbName').value+extention;
 	var listNotDbs = document.getElementById('notDbName').value.split(";");
 	var notDatabase = "";
 	for (var i = 0; i < listNotDbs.length; i++) {
-		notDbNameId = listNotDbs[i]+'_collection';
+		notDbNameId = listNotDbs[i]+extention;
+		if (notDatabase == ""){
+			notDatabase=notDbNameId;
+		}else{
+			notDatabase+= ";"+notDbNameId;
+		}
+	}
+
+	selectDataToBeShown(database,notDatabase);
+
+
+};
+//for the collection functionality
+function selectCollectionDataToBeShown(radioId){
+	
+	var listNotDbs = document.getElementById('notDbName').value.split(";");
+	var notDatabase = "";
+	if (radioId=="scat"){
+		var extention = "_collection";
+	}else{
+		var extention = "_collection_forCluster";
+	}
+	var database = document.getElementById('dbName').value + extention;
+	for (var i = 0; i < listNotDbs.length; i++) {
+		notDbNameId = listNotDbs[i]+extention;
 		if (notDatabase == ""){
 			notDatabase=notDbNameId;
 		}else{
@@ -534,6 +612,7 @@ function selectCollectionDataToBeShown(){
 
 	selectDataToBeShown(database,notDatabase);
 }
+
 $('.panel-title a').collapse();
 
 $(document).ready(function() {
@@ -542,3 +621,256 @@ $(document).ready(function() {
         $(event.target).parents('.btn-group').find('.dropdown-toggle').html(option+' <span class="caret"></span>');
     });
 });
+
+function setHiddenValues(keywordString, searchQuery, location, fromDate, toDate){
+	document.getElementById('keywordsToCluster').value = keywordString;
+	
+
+	console.log(document.getElementById('searchQuery').value);
+};
+
+function createDonuts(clustersString){
+	if (clustersString.includes(";")==true){
+		var mainClustersList = clustersString.split(';')
+	}else{
+		var mainClustersList = [clustersString];
+	}
+
+	
+	for (i=0; i<mainClustersList.length; i++){
+		var total = 0;
+		var clustersList = mainClustersList[i].split(',');
+		var listOfClusters = [];
+		
+		for (j=0; j<clustersList.length; j++){
+			var cluster = clustersList[j].split('|');
+			total += parseInt(cluster[2]);
+			console.log(cluster);
+			listOfClusters.push(cluster)
+		}
+		document.getElementById('nameOfGroup').innerHTML = "<h4>"+listOfClusters[0][1]+"</h4>";
+		donutGen(listOfClusters, total);
+	}
+};
+
+function donutGen(listOfClusters, total){
+	var clustersJson = [];
+	var colors_array = [];
+	var allTweetsStr = document.getElementById('tweetsList').value;
+	console.log(allTweetsStr);
+	var listOfStrTweets = allTweetsStr.split(';');
+	listOfTweets = [];
+	for (var i = 0; i < listOfStrTweets.length; i++) {
+		var tweetDataList = listOfStrTweets[i].split('|');
+		listOfTweets.push(tweetDataList);
+	}
+	console.log(listOfTweets);
+	for(i=0;i<listOfClusters.length; i++){
+		var cluster = new Cluster(listOfClusters[i]);
+		var color = getRandomColor();
+		colors_array.push(color);
+		clustersJson.push(cluster);
+	}
+	var jsonPointListStr=JSON.stringify(clustersJson);
+	var jsonPointList = JSON.parse(jsonPointListStr);
+
+	var keywordsChart = Morris.Donut({
+	  element: 'pies',
+	  data: jsonPointList,
+	  colors: colors_array 
+  }).on('click', function(i, row){
+    var layout="";
+    for (var i = 0; i < listOfTweets.length; i++) {
+    	console.log(listOfTweets);
+    	console.log(row.label);
+    	if (row.label == listOfTweets[i][2]){
+    		layout += "<div class='col-xs-8' id='tweet'><div class='col-xs-6' id='author'>\
+                <span style='color:#FFF;'>"+listOfTweets[i][6]+"</span> <span style='color:#D3D3D3;'>@"+listOfTweets[i][1]+"</span></div>\
+            <div class='col-xs-3' id='time'>"+listOfTweets[i][4]+"</div>\
+            <div class='col-xs-3'><a href='"+listOfTweets[i][7]+"' target='_blank'>Show tweet on Twitter</a></div>\
+            <div class='col-xs-12' id='tweetText'>"+listOfTweets[i][0]+"<br></div></div>";	
+    	}
+    }
+    document.getElementById('tweets').innerHTML="";
+    document.getElementById('tweets').innerHTML=layout;
+    });
+      keywordsChart.options.data.forEach(function(label, i){
+      var textValue = label['label']+": "+label['value'];	
+      var legendItem = $('<span></span>').text(textValue).prepend('<i>&nbsp;</i>');
+      legendItem.find('i').css('backgroundColor', keywordsChart.options.colors[i]);
+    $('#legend').append(legendItem)
+  })
+};
+
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+function Cluster(cluster){
+	this.label = cluster[0];
+	this.value = cluster[2];
+};
+
+$('#radioBtn a').on('click', function(){
+    var sel = $(this).data('title');
+    var tog = $(this).data('toggle');
+    $('#'+tog).prop('value', sel);
+    
+    $('a[data-toggle="'+tog+'"]').not('[data-title="'+sel+'"]').removeClass('active').addClass('notActive');
+    $('a[data-toggle="'+tog+'"][data-title="'+sel+'"]').removeClass('notActive').addClass('active');
+    if(document.getElementById('checkIfKeywords').value=="Y"){
+    	showAddKeywordButton('eitherOrContent','Add a keyword group');
+    	document.getElementById("check").value="display error";
+    }else{
+    	hiddenInputs = "<input type='hidden' name='groups' value='no groups'/><input type='hidden' name='group' value='no groups'/>"
+    	document.getElementById('eitherOrContent').innerHTML=hiddenInputs;
+    }
+
+});
+function showKeywordGroups(keywordGroup){
+	if (keywordGroup=='no groups'){
+		$('input[id="clusterFromKGroups"]').prop('disabled', true);
+		$('input[id="segmentFromKGroups"]').prop('disabled', true);
+	}else{
+		layout="<p>"+keywordGroup+"</p>";
+		document.getElementById('showkeywordGroup').innerHTML=layout;
+	}
+};
+function showAddKeywordButton(divId, buttonTitle,keywordInputName){
+	layout = "<div class='col-sm-10' id='keywordGroupShow'><div id='errorArea'></div></div><div id='keywordGroupModalDiv' class='keywordGroupModal col-xs-8'>\
+    <button type='button' class='btn btn-success btn-lg' data-toggle='modal' data-target='#kGroupModal'>"+buttonTitle+"</button></div>"
+
+    document.getElementById(divId).innerHTML=layout;
+    document.getElementById('keywordInputName').value=keywordInputName;
+};
+function createLabelsForKeywords(keyword, letters){
+	var searchString='';
+	var keywordLayout ="";
+	for (let i=0; i<keyword.length; i++){
+		if (keyword[i].value.length>0 ){
+			if (keyword[i].value.match(letters)){
+				keywordLayout+="<div class='label label-success col-sm-5 addSpace'>"+ keyword[i].value+"</div>";
+				if (/\s/.test(keyword[i].value)) {
+					var keywordPlus = keyword[i].value.replace(/\s/g,"+");
+					searchString += keywordPlus;
+				}else{
+					searchString +=keyword[i].value;
+				}						
+				if (i<keyword.length-1){
+						searchString+=",";
+				} 
+			} else {
+				keywordLayout = "<div class='alert alert-danger' role='alert'>Please, use only \
+				alphabetical characters, '.' or '-'</div>";
+				document.getElementById("check").value = "no groups";	
+				break;
+				}		
+			}
+		}
+	var keywordEntitiesArray = [searchString, keywordLayout];
+	return keywordEntitiesArray;	
+};
+function saveAndDisplayKeywords(){
+	var div = createAContainerForKeywords();
+	var keyword = document.getElementsByName("kgroups")
+	var keywordInputName = document.getElementById('keywordInputName').value;	
+	var letters = /^[A-Za-z.-\s]+$/;
+	document.getElementById("check").value = "some groups";
+	document.getElementById("errorArea").innerHTML = "";
+	if (keyword[0].value.length>0){
+		layout = '<div id="buttonForClose"><button type="button" class="close" aria-label="Close">\
+ 			<span aria-hidden="true">&times;</span></button></div><div class="btn-group" data-toggle="buttons" style="width: 100%;">';
+ 		var keywordEntitiesArray = createLabelsForKeywords(keyword, letters);
+		console.log(keywordEntitiesArray[0]);
+		layout = layout + keywordEntitiesArray[1] + "<input type='hidden' name='"+keywordInputName+"' id='"+keywordInputName+"' value="+keywordEntitiesArray[0]+">\
+		</div><div class='enrichCheckBox col-sm-12' id='enrichCheckBox'><input type='checkbox' name='keywordEnrichments' id='keywordEnrichments' value='enrich'>\
+		Enrich keywords </div>";
+		
+		div.innerHTML = layout;
+		
+		document.getElementById("errorMessageArea").innerHTML = "";
+		document.getElementById("keywordGroupShow").appendChild(div);
+
+		document.getElementById('keywordGroupModalDiv').style.display='none';
+		console.log(document.getElementById(keywordInputName).value);
+		if (keywordInputName=='groupCluster'){
+
+			setKeywordsToCluster(document.getElementById(keywordInputName).value);
+		}else{
+			setKeywordsForSegment(document.getElementById(keywordInputName).value);
+		}
+		
+	}else{
+		alertMessageDiv= "<div class='alert alert-danger' role='alert'><strong>Oh snap!</strong> \
+		You must give at least one word.</div>"
+		document.getElementById("errorMessageArea").innerHTML = alertMessageDiv;
+		return false;
+	}	
+};
+function setKeywordsToCluster(keywords){
+	document.getElementById('keywordsToCluster').value = keywords;
+	console.log(document.getElementById('keywordsToCluster').value);
+	document.getElementById("errorClusterArea").innerHTML = "";
+};
+function setKeywordsForSegment(keywords){
+	document.getElementById('keywordsForSegments').value = keywords;
+	console.log(document.getElementById('keywordsForSegments').value);
+	document.getElementById("errorSegmentArea").innerHTML = "";
+
+};
+
+function toggleKeywordContent(divId){
+	var x = document.getElementById(divId);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+};
+function hideOtherContent(selectedContent){
+	if(selectedContent=="searchWords"){
+		document.getElementById('showkeywordGroup').style.display = 'none';
+		document.getElementById('addOwnWordsClusters').innerHTML="";
+	}else if(selectedContent=="keywordGroups"){
+		document.getElementById('searchKeywords').style.display = 'none'
+		document.getElementById('addOwnWordsClusters').innerHTML="";		
+	}else{
+		document.getElementById('searchKeywords').style.display = 'none';
+		document.getElementById('showkeywordGroup').style.display = 'none';
+
+	}
+}; 
+function validateClusterForm(){
+
+	if (document.forms["clusterForm"]["keywordsToCluster"].value==""){
+		alertMessageDiv= "<div class='alert alert-danger' role='alert'><strong>Whops</strong> \
+		You forgot to specify keywords for clusters.</div>";
+		document.getElementById("errorClusterArea").innerHTML = alertMessageDiv;
+		return false;
+	}else if (document.forms["clusterForm"]["keywordsForSegments"].value==""){
+		alertMessageDiv= "<div class='alert alert-danger' role='alert'><strong>Whops</strong> \
+		You forgot to specify keywords for cluster segments.</div>";
+		document.getElementById("errorSegmentArea").innerHTML = alertMessageDiv;
+		return false;
+	}else{
+		var enrichedCheckbox = document.getElementsByName('keywordEnrichments');
+		if (enrichedCheckbox[0].checked){
+			document.getElementById('enrichKeywords').value='enrich';
+		}else{
+			document.getElementById('enrichKeywords').value='do not';
+		}
+		$(".se-pre-con").show();
+        $("#mainContainer").hide();
+		return true;
+	}
+};
+function checkForNoResultKeywords(check){
+	if (check=='0'){
+		message = "<div class='alert alert-info'>All selected keywords returned some results.</div>";
+		document.getElementById('keywordInfo').innerHTML=message;
+	}
+} 

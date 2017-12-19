@@ -32,6 +32,21 @@ def locationQueryKeyword(cursor, keyword,searchDescription, location, fromDate, 
      row = cursor.fetchall()
 
      return row
+
+def retrieveAllTweetsFromTimeframe(cursor,searchDescription, location, fromDate, toDate):
+     cursor.execute("SELECT [Post].[Id],[Post].[hasCreator],\
+     [Post].[body], [Post].[createdAt], [Post].[platformPostID],\
+     [UserAccount].[platformAccountId],[Search].[Note], [Post].[SearchId],\
+     [UserAccount].[verified],[UserAccount].[displayName] \
+     FROM [Post]\
+     INNER join [Search] ON [Post].[SearchId]=[Search].Id\
+     INNER join [UserAccount] ON [UserAccount].[Id]= [Post].[hasCreator]\
+     WHERE [Search].[Note] LIKE '%"+ searchDescription +"%' AND [Search].[Note] LIKE '%"+ location +"%'\
+     AND [Post].[createdAt]>= '"+fromDate+"' AND [Post].[createdAt]<='"+toDate+"'\
+     ORDER BY [Post].[createdAt] ASC")
+     row = cursor.fetchall()
+
+     return row    
 #collect unique sprint notes
 def sprintNotesQuery(cursor,dbName):
     cursor.execute("SELECT Distinct [Search].[Note]  FROM [Search]")

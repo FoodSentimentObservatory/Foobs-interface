@@ -5,6 +5,7 @@
     <link  rel="stylesheet" href="/static/css/styles.css" type="text/css"/>
     <link  rel="stylesheet" href="/static/css/newStyles.css" type="text/css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src = "/static/js/bootstrap.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.2/modernizr.js"></script>
 
@@ -40,7 +41,7 @@
           {% endif %}  
           
       {% endfor %}
-      <input type="hidden" name="keywordGroup" value=""> 
+       
       </ul>    
       <div class='tab-content'>
       
@@ -51,8 +52,6 @@
           {% else %}  
             <div id='{{key}}' class='tab-pane fade'>
           {% endif %}  
-
-
           <!-- getting data about the group size and frequent words from the group list, if there's a match with the dict key, we get the data from that sublist-->
           {% for group in groupList %}
             {% if group[0]==key %}
@@ -66,11 +65,22 @@
                 {% endif %}
                 <input type="hidden" name="group" value="{{group[4]}}">
                 <input type="hidden" name="tweets" value="{{group[5]}}">
-                <div class="col-xs-8"><h4>There are {{group[3]}} tweets for this group of keywords.</h4></div>
-                <div class="col-xs-4">
-                  <button type="button" class="btn icon-btn btn-success smallButton" data-toggle="modal" data-target="#collectionsModal" >
-                    <span class="glyphicon btn-glyphicon glyphicon-plus img-circle text-success">\</span>Add results for <strong>{{group[1]}}</strong> to a colection
-                  </button>
+                <div class="col-xs-4"><h4>There are {{group[3]}} tweets for this group of keywords.</h4></div>
+                <div class="col-xs-8">
+                  <div class="col-xs-6">
+                    <button type="button" class="btn icon-btn btn-success smallButton" data-toggle="modal" data-target="#collectionsModal" >
+                      <span class="glyphicon btn-glyphicon glyphicon-plus img-circle text-success">\</span>Add results for <strong>{{group[1]}}</strong> to a colection
+                    </button>
+                  </div>
+                {% for groupQueryData in queryData %}  
+                  {% if groupQueryData[0] == group[0] %}
+                  <div class="col-xs-6">
+                    <button type="button" class="btn icon-btn btn-success smallButton" data-toggle="modal" data-target="#clustersModal" onclick="setHiddenValues('{{groupQueryData[1]}}', '{{groupQueryData[2]}}', '{{groupQueryData[3]}}', '{{groupQueryData[4]}}', '{{groupQueryData[5]}}')">
+                      <span class="glyphicon btn-glyphicon glyphicon-signal img-circle text-success">\</span>Cluster the results for <strong>{{group[1]}}</strong>
+                    </button>
+                  </div>
+                  {% endif %}
+                {% endfor %}  
                 </div>
                 <div class='wordBubble col-sm-12'>
                   <h4>Most frequent words:</h4>
@@ -101,8 +111,9 @@
                 <span style='color:#FFF;'>{{tweet[4]}}</span> <span style='color:#D3D3D3;'>@{{tweet[2]}}</span> 
               {% endif %}  
             </div>
-            <div class='col-xs-6' id='time'>{{tweet[1]}}</div>
-            <div class='col-xs-12' id='tweetText'>{{tweet[7]}}<br></div></div>
+            <div class='col-xs-3' id='time'>{{tweet[1]}}</div>
+            <div class="col-xs-3"><a href="{{tweet[7]}}" target="_blank">Show tweet on Twitter</a></div>
+            <div class='col-xs-12' id='tweetText'>{{tweet[8]}}<br></div></div>
         {% endfor %}
         </div>
         {% else %}
@@ -115,11 +126,9 @@
        </div>
     </div>
     </div>
-
      <!-- Modal -->
     <div class="modal fade" id="collectionsModal" role="dialog" >
-      <div class="modal-dialog">
-      
+      <div class="modal-dialog">    
         <!-- Modal content-->
         <div class="modal-content">
           <div class="modal-header">
@@ -150,6 +159,42 @@
           </div>
           <div class="modal-footer">
             <button type='submit' class='btn btn-success'>Add to collection</button>
+             </form>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+         <!-- Modal -->
+    <div class="modal fade" id="clustersModal" role="dialog">
+      <div class="modal-dialog">
+      
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Specify keywords for clustering</h4>
+          </div>
+          <div class="modal-body">
+          <input type='checkbox' name='keywordEnrichments' id='keywordEnrichments' value='enrich'>Enrich keywords
+          <form action = "/createClusters" name="kgroupForm" onsubmit="validateClusterForm()">
+          <div class="keywordGroup col-sm-8"> 
+            <div class="entry input-group col-xs-12 ui-widget unstyled">
+              <input type="hidden" name="keywordsToCluster" id="keywordsToCluster" value="" />
+              <input type="hidden" name="enrichKeywords" id="enrichKeywords" value="" />                      
+              <input class="form-control tags" name="keywordsForSegments" type="text" value="" placeholder="Type something" />
+                <span class="input-group-btn">
+                   <button class="btn btn-success btn-addSelection" type="button">
+                      <span class="glyphicon glyphicon-plus"></span>
+                  </button>
+                </span> 
+            </div>
+          </div>
+          </div>
+          <div class="modal-footer">
+            <button type='submit' class='btn btn-success'>Cluster</button>
              </form>
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>

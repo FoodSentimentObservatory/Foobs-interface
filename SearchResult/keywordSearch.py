@@ -27,15 +27,7 @@ class SearchResult:
 		return listOfCollections
 #splits the string input of keywords into a list of lists
 	def listOfGroups(self):
-		listOfGroups=[]	
-		#checking if there's only one or multiple keyword groups
-		if isinstance(self.group, str):
-			listofwords = self.group.split(",")
-			listOfGroups.append(listofwords)
-		else:
-			for g in self.group:
-				singleGroup = g.split(",")
-				listOfGroups.append(singleGroup)
+		listOfGroups=resultsFiltering.splitStrOfGroups(self.group)	
 		return listOfGroups		
 #fetches tweets for all keyword groups, adds a clickable links version of the tweet text and returns
 #a dictionary to the controller
@@ -58,20 +50,61 @@ class SearchResult:
 
 		index=5
 		tweetDictionary = resultsFiltering.dictionaryGen(tweetList,index)
+
 		return tweetDictionary
 #returns a list of keyword groups
 	def getGroupList(self):
 		i=0
 		groupList = []
-		for groupOfTweets in self.tweets:
-			numberOfTweets = len(groupOfTweets)
-			strGroupOfTweets = ','.join(self.listOfGroups[i])
-			print(strGroupOfTweets)
-			frequentWords = frequencyCount.frequencyCount(groupOfTweets,self.listOfGroups[i])
-			
-			noCommaGroupOfTweets = strGroupOfTweets.replace(',','')
-			groupTup = (noCommaGroupOfTweets, strGroupOfTweets,i,numberOfTweets,frequentWords, groupOfTweets)
+		if self.listOfGroups[0] != 'all tweets':
+			for groupOfTweets in self.tweets:
+				numberOfTweets = len(groupOfTweets)
+				strGroupOfTweets = ','.join(self.listOfGroups[i])
+				frequentWords = frequencyCount.frequencyCount(groupOfTweets,self.listOfGroups[i])
+				
+				noCommaGroupOfTweets = strGroupOfTweets.replace(',','')
+				groupTup = (noCommaGroupOfTweets, strGroupOfTweets,i,numberOfTweets,frequentWords, groupOfTweets)
+				groupList.append(groupTup)
+				i+=1
+		else:
+			numberOfTweets=len(self.tweets[0])	
+			frequentWords = frequencyCount.frequencyCount(self.tweets[0],self.listOfGroups)	
+			noCommaGroupOfTweets="alltweets"
+			groupTup = (noCommaGroupOfTweets, self.listOfGroups[0],i,numberOfTweets,frequentWords, self.tweets[0])
 			groupList.append(groupTup)
-			i+=1
+
 		return groupList
+
+	def getQueryData(self):
+		queryDataList = []
+		if self.listOfGroups[0] != 'all tweets':
+			for group in self.listOfGroups:
+				keywordString = ','.join(group)
+				noCommaKeywordGroup = ''.join(group)
+				groupTup = (noCommaKeywordGroup,keywordString,self.searchQuery, self.location, self.fromDate, self.toDate)
+				queryDataList.append(groupTup)
+		else:
+			noCommaKeywordGroup	="alltweets"
+			groupTup = (noCommaKeywordGroup,self.listOfGroups[0],self.searchQuery, self.location, self.fromDate, self.toDate)
+			queryDataList.append(groupTup)	
+
+		return queryDataList		
+
+	def filterTweets(self, keywordsToClusterEnriched):
+		tweetsDictionary = self.retrieveTweets()
+		newListOfTweets = []
+		
+		for key, value in tweetsDictionary.items():
+			for tweet in value:
+				for word in keywordsToClusterEnriched:
+					alreadySeenWords=[]
+					count = resultsFiltering.findWordInText(word, alreadySeenWords, tweet[0])
+					if count>0:
+						newTweetList = [tweet[0],tweet[1],tweet[2],tweet[3],tweet[4],tweet[5],tweet[6], word]
+						newListOfTweets.append(newTweetList)
+
+		index = 7
+		newTweetsDictionary = resultsFiltering.dictionaryGen(newListOfTweets,index)
+
+		return 	newTweetsDictionary				
 

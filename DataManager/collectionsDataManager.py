@@ -21,7 +21,8 @@ def getListOfCollection(database, listOfCollectionsWithDb):
     collectionsData = getExistingCollections(cursor)
     for collection in collectionsData:
         databaseCollectionName = database+"_collection"
-        newCollectionDataList = [collection[0], collection[1], collection[2], collection[3], collection[4], collection[5], databaseCollectionName]
+        clusterRadioDbName = database+"_collection_forCluster"
+        newCollectionDataList = [collection[0], collection[1], collection[2], collection[3], collection[4], collection[5], databaseCollectionName,clusterRadioDbName]
         listOfCollectionsWithDb.append(newCollectionDataList)
     conn.close()
 

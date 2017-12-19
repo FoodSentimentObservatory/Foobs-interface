@@ -13,7 +13,9 @@ body {
 	padding-bottom: 10px;
 
 }
-
+#whitie{
+	padding: 10px;
+}
 #footerId {
   position: absolute;
   bottom: 0;
@@ -195,7 +197,7 @@ fieldset {
 
 }
 
-#info{
+.info{
 	width:100%;					
 	background: white;
 	color: black;
@@ -377,4 +379,66 @@ ul.ui-autocomplete {
 .topicDivs{
 	margin-top: 2px;
 	padding-top: 2px;
+}
+#provenance,
+#searchKeywords{
+	max-height: 250px;
+	overflow-y: scroll;
+}
+#searchKeywords,
+#showkeywordGroup{
+	background: #f2f2f2;
+    border-radius: 3px;
+    margin-left: 20px;
+}
+#radioBtn .notActive{
+    color: #3276b1;
+    background-color: #fff;
+}
+.showButton{
+	margin-top: 0.5em;
+}
+.bottom{
+	border-top: 1px solid #E6E6FA;
+	padding: 0.5em;
+	margin-top: 0.5em;
+}
+.label-success{
+	font-size: 15px !important;
+	margin-left: 2px !important;
+}
+.countContent{
+	margin-bottom: 5px;
+}
+.resHeader{
+	border-bottom: 1px solid #E6E6FA;
+	padding: 0.5em;
+	margin-top: 0.5em;
+	margin-bottom: 1em;
+}
+.enrichCheckBox input[type="checkbox"]:empty{
+	display: block !important;
+	border-top: 1px solid #E6E6FA;
+	margin-top: 0.3em;
+}
+.addSpace{
+	margin-left: 0.5em;
+	margin-top: 0.5em;
+}
+.panel-heading{
+	background: #e6e6e6;
+    border: 1px solid #cccccc;
+}
+.noResult{
+	background-color: #fff;
+  	color: #696969;
+  	border-radius: 4px;
+  	border: 1px solid #B0BEC5;
+  	width: 30%;
+}
+.keywordInfo{
+	padding-top: 2em;
+}
+iframe {
+    border: none;
 }
