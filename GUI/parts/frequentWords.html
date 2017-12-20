@@ -1,0 +1,8 @@
+<div class='wordBubble col-sm-12'>
+    <h4>Most frequent words:</h4>
+    <p>
+        {% for tup in group[4] %}
+            <button type="submit" class="btn btn-success spacedButton" name="word" value="{{tup[1]}}">{{tup[1]}} <span class="badge">{{tup[0]}}</span></button>
+        {% endfor %}  
+    </p>
+</div>

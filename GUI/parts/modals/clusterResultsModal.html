@@ -1,0 +1,31 @@
+<div class="modal fade" id="clustersModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Specify keywords for clustering</h4>
+      </div>
+      <div class="modal-body">
+        <input type='checkbox' name='keywordEnrichments' id='keywordEnrichments' value='enrich'>Enrich keywords
+        <form action = "/createClusters" name="kgroupForm" onsubmit="validateClusterForm()">
+        <div class="keywordGroup col-sm-8"> 
+          <div class="entry input-group col-xs-12 ui-widget unstyled">
+            <input type="hidden" name="keywordsToCluster" id="keywordsToCluster" value="" />
+            <input type="hidden" name="enrichKeywords" id="enrichKeywords" value="" />                      
+            <input class="form-control tags" name="keywordsForSegments" type="text" value="" placeholder="Type something" />
+            <span class="input-group-btn">
+              <button class="btn btn-success btn-addSelection" type="button">
+                <span class="glyphicon glyphicon-plus"></span>
+              </button>
+            </span> 
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type='submit' class='btn btn-success'>Cluster</button>
+          </form>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>    

@@ -1,0 +1,37 @@
+<div class="modal fade" id="collectionsModal" role="dialog" >
+  <div class="modal-dialog">          
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Select a collection or create a new one</h4>
+          </div>
+          <div class="modal-body" onload= "giveUniqueId()">
+          <form action = "/saveCollection">
+            <select class="form-control nav" id="listOfCollections" onchange="changeValues()">
+            <option value="" disabled selected>Select an option</option>
+            <optgroup label="Create new">
+            <option value="" >Create new collection</option>
+            </optgroup>
+            <optgroup label="Select from existing collections">
+              {% for collection in listOfCollections %}
+                <option value="{{collection[1]+'|'+collection[3]+'|'+collection[2]}}" >{{collection[3]}}</option>
+              {% endfor %}  
+            </optgroup>
+            </select>
+            <input type="hidden" name="collectionId" id="collectionId" value="">
+            <h5>Name:</h5>
+            <input type="text" class="form-control" name="collectionName" id = "collectionName" value="" placeholder="Type the name of the new collection" disabled>
+            <h5>Description:</h5>
+            <input type="text" class="form-control" name="collectionDescription" id="collectionDescription" value="" placeholder="Describe the content of the collection" disabled>
+           <input type="hidden" name="dbName" id="dbName" value="">
+           <input type="hidden" name="dateOfCreation" id="dateOfCreation" value="">
+           <input type="hidden" name="groupOfKeywords" id="groupOfKeywords" value="">
+          </div>
+          <div class="modal-footer">
+            <button type='submit' class='btn btn-success'>Add to collection</button>
+             </form>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>      
+  </div>
+</div>
