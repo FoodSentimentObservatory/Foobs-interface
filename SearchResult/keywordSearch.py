@@ -74,7 +74,7 @@ class SearchResult:
 			groupList.append(groupTup)
 
 		return groupList
-
+#used to generate list of data for the query for each tweet result dataset, for the create clusters button
 	def getQueryData(self):
 		queryDataList = []
 		if self.listOfGroups[0] != 'all tweets':
@@ -89,7 +89,9 @@ class SearchResult:
 			queryDataList.append(groupTup)	
 
 		return queryDataList		
-
+#used by the createClusters function in the case in which we specify keyword groups in the KeywordSearch page
+#filters those tweets by the keyword list that was specified in the clustersSpecForm page
+#if no keyword groups were selected in the keywordSearch page, we use the retrieveTweets function straight away instead of this one
 	def filterTweets(self, keywordsToClusterEnriched):
 		tweetsDictionary = self.retrieveTweets()
 		newListOfTweets = []

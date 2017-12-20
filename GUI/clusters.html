@@ -1,35 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link  rel="stylesheet" href="/static/css/bootstrap.css" type="text/css"/>
-    <link  rel="stylesheet" href="/static/css/styles.css" type="text/css"/>
-    <link  rel="stylesheet" href="/static/css/newStyles.css" type="text/css"/>
+    {% include "parts/headContent.html" %}
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src = "/static/js/bootstrap.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.2/modernizr.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
 
   </head>
 
   <body onload = "createDonuts('{{clustersList}}')">
-    <div class="se-pre-con"></div>
-    
-      <nav class="navbar navbar-inverse">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="#">Food Sentiment Observatory</a>
-        </div>
-        <ul class="nav navbar-nav">
-          <li><a href="/index">Home</a></li>
-          <li><a href="/manual">Manual</a></li>
-          <li> <a href="/collectionsPage">Collections</a></li>
-          <li><a href="/topicVisualisationHomePage">Topic Visualisation</a></li>
-        </ul>
-      </div>
-    </nav>  
+    {% include "parts/menu.html" %}  
     <div class="container" id="mainContainer">
     
     <div class="col-sm-12" id="whitie">
@@ -43,22 +26,7 @@
         <div id="tweets">
             <h3>Tweets</h3>
             {% for tweet in tweetsOfClustersList %}
-              <div class='col-xs-8' id='tweet'>
-            <div class='col-xs-6' id='author'>
-              {% if tweet[5]=='True' %}
-                <span style='color:#FFF;'>{{tweet[6]}}</span> <span style='color:#D3D3D3;'>@{{tweet[1]}}</span> 
-                <span class='glyphicon glyphicon-ok blue'></span>
-              {% else %}  
-                <span style='color:#FFF;'>{{tweet[6]}}</span> <span style='color:#D3D3D3;'>@{{tweet[1]}}</span> 
-              {% endif %}  
-            </div>
-            <div class='col-xs-3' id='time'>{{tweet[4]}}</div>
-            <div class="col-xs-3"><a href="{{tweet[7]}}" target="_blank">Show tweet on Twitter</a></div>
-            <div class='col-xs-12' id='tweetText'>
-              {{tweet[0]}}<br>
-
-            </div>
-            </div>      
+              {% include "parts/tweet.html" %}     
             {% endfor %}
         </div>   
       </div>

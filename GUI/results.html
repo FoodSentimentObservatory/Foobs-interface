@@ -1,48 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link  rel="stylesheet" href="/static/css/bootstrap.css" type="text/css"/>
-    <link  rel="stylesheet" href="/static/css/styles.css" type="text/css"/>
-    <link  rel="stylesheet" href="/static/css/newStyles.css" type="text/css"/>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    {% include "parts/headContent.html" %}
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src = "/static/js/bootstrap.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.2/modernizr.js"></script>
-
+    <title>FoObs Results</title>
   </head>
 
   <body>
-    <div class="se-pre-con"></div>
-    
-      <nav class="navbar navbar-inverse">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="#">Food Sentiment Observatory</a>
-        </div>
-        <ul class="nav navbar-nav">
-          <li><a href="/index">Home</a></li>
-          <li><a href="/manual">Manual</a></li>
-          <li> <a href="/collectionsPage">Collections</a></li>
-          <li><a href="/topicVisualisationHomePage">Topic Visualisation</a></li>
-        </ul>
-      </div>
-    </nav>  
+    {% include "parts/menu.html" %} 
     <div class="container" id="mainContainer">
     
     <div class="col-sm-12" id="whitie">
       <h2>Results</h2>
       <!-- generating the tabs from a list of group data -->
-      <ul class='nav nav-tabs'>
-      {% for group in groupList %}
-          {% if group[2] == 0 %}
-            <li class='active'><a data-toggle='tab' href='#{{group[0]}}' role="tab" onclick="changeKeywords('{{group[1]}}')">{{group[1]}}</a></li>
-          {% else %}
-            <li><a data-toggle='tab' href='#{{group[0]}}' role="tab" onclick="changeKeywords('{{group[1]}}')">{{group[1]}}</a></li> 
-          {% endif %}  
-          
-      {% endfor %}
-       
-      </ul>    
+      {% include "parts/tabs.html" %}    
       <div class='tab-content'>
       
       <!--each tab content is a separate item of a dictionary -->
@@ -55,7 +28,7 @@
           <!-- getting data about the group size and frequent words from the group list, if there's a match with the dict key, we get the data from that sublist-->
           {% for group in groupList %}
             {% if group[0]==key %}
-              {% if group[3] > 0 %}
+              
               <form role="form" autocomplete="off" action = "/frequentKeywordSearch">
                 <input type="hidden" name="groupIdStr" value="{{group[0]}}">
                 {% if group[2] == 0 %}
@@ -82,43 +55,22 @@
                   {% endif %}
                 {% endfor %}  
                 </div>
-                <div class='wordBubble col-sm-12'>
-                  <h4>Most frequent words:</h4>
-                  <p>
-                  {% for tup in group[4] %}
-                    <button type="submit" class="btn btn-success spacedButton" name="word" value="{{tup[1]}}">{{tup[1]}} <span class="badge">{{tup[0]}}</span></button>
-                  {% endfor %}  
-                  </p>
-                </div></form>
-              {% else %}
-                <h4>Sorry, no tweets were found</h4>
-              {% endif %}    
+                {% include "parts/frequentWords.html" %}
+              </form>
+                 
 
             {% endif %}  
           {% endfor %} 
         <!--Displaying the tweet content-->  
         <div class="col-sm-12"><h4>Tweets</h4>  </div>
-        {% if values|length > 0 %}
+        
         <div id="groupsContent" class="col-sm-12">  
               
         {% for tweet in values %}  
-          <div class='col-xs-8' id='tweet'>
-            <div class='col-xs-6' id='author'>
-              {% if tweet[3]=='True' %}
-                <span style='color:#FFF;'>{{tweet[4]}}</span> <span style='color:#D3D3D3;'>@{{tweet[2]}}</span> 
-                <span class='glyphicon glyphicon-ok blue'></span>
-              {% else %}  
-                <span style='color:#FFF;'>{{tweet[4]}}</span> <span style='color:#D3D3D3;'>@{{tweet[2]}}</span> 
-              {% endif %}  
-            </div>
-            <div class='col-xs-3' id='time'>{{tweet[1]}}</div>
-            <div class="col-xs-3"><a href="{{tweet[7]}}" target="_blank">Show tweet on Twitter</a></div>
-            <div class='col-xs-12' id='tweetText'>{{tweet[8]}}<br></div></div>
+          {% include "parts/tweet.html" %}
         {% endfor %}
         </div>
-        {% else %}
-          <h4>Sorry, no tweets were found</h4>
-        {% endif %}
+        
         </div>
 
        {% endfor %}
@@ -126,88 +78,10 @@
        </div>
     </div>
     </div>
-     <!-- Modal -->
-    <div class="modal fade" id="collectionsModal" role="dialog" >
-      <div class="modal-dialog">    
-        <!-- Modal content-->
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Select a collection or create a new one</h4>
-          </div>
-          <div class="modal-body" onload= "giveUniqueId()">
-          <form action = "/saveCollection">
-            <select class="form-control nav" id="listOfCollections" onchange="changeValues()">
-            <option value="" disabled selected>Select an option</option>
-            <optgroup label="Create new">
-            <option value="" >Create new collection</option>
-            </optgroup>
-            <optgroup label="Select from existing collections">
-              {% for collection in listOfCollections %}
-                <option value="{{collection[1]+'|'+collection[3]+'|'+collection[2]}}" >{{collection[3]}}</option>
-              {% endfor %}  
-            </optgroup>
-            </select>
-            <input type="hidden" name="collectionId" id="collectionId" value="">
-            <h5>Name:</h5>
-            <input type="text" class="form-control" name="collectionName" id = "collectionName" value="" placeholder="Type the name of the new collection" disabled>
-            <h5>Description:</h5>
-            <input type="text" class="form-control" name="collectionDescription" id="collectionDescription" value="" placeholder="Describe the content of the collection" disabled>
-           <input type="hidden" name="dbName" id="dbName" value="">
-           <input type="hidden" name="dateOfCreation" id="dateOfCreation" value="">
-           <input type="hidden" name="groupOfKeywords" id="groupOfKeywords" value="">
-          </div>
-          <div class="modal-footer">
-            <button type='submit' class='btn btn-success'>Add to collection</button>
-             </form>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-        
-      </div>
-    </div>
-
-         <!-- Modal -->
-    <div class="modal fade" id="clustersModal" role="dialog">
-      <div class="modal-dialog">
+     {% include "parts/modals/saveToCollectionModal.html" %}
       
-        <!-- Modal content-->
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Specify keywords for clustering</h4>
-          </div>
-          <div class="modal-body">
-          <input type='checkbox' name='keywordEnrichments' id='keywordEnrichments' value='enrich'>Enrich keywords
-          <form action = "/createClusters" name="kgroupForm" onsubmit="validateClusterForm()">
-          <div class="keywordGroup col-sm-8"> 
-            <div class="entry input-group col-xs-12 ui-widget unstyled">
-              <input type="hidden" name="keywordsToCluster" id="keywordsToCluster" value="" />
-              <input type="hidden" name="enrichKeywords" id="enrichKeywords" value="" />                      
-              <input class="form-control tags" name="keywordsForSegments" type="text" value="" placeholder="Type something" />
-                <span class="input-group-btn">
-                   <button class="btn btn-success btn-addSelection" type="button">
-                      <span class="glyphicon glyphicon-plus"></span>
-                  </button>
-                </span> 
-            </div>
-          </div>
-          </div>
-          <div class="modal-footer">
-            <button type='submit' class='btn btn-success'>Cluster</button>
-             </form>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-        
-      </div>
-    </div>
-    <!--
-      <footer class="footer" id="footerId">
-      <div class="container"> 
-        
-      </div>
-    </footer>-->
+     {% include "parts/modals/clusterResultsModal.html" %} 
+
     <script src = "/static/js/scripts.js"></script>
 
 </body>

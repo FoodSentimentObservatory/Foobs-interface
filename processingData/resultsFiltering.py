@@ -81,7 +81,9 @@ def replaceChars(oldChar, newChar, text):
 
 def addTweetToNewGroupsList(word,tweet,groupIdStr,newGroups):
     groupId=groupIdStr+word
-    tweetWithWord = [tweet[0], tweet[1], tweet[2], tweet[3], tweet[4],word,groupId]
+    textWithLinks = clickableLinks(tweet[0])
+    linkToTweet = "#"
+    tweetWithWord = [tweet[0], tweet[1], tweet[2], tweet[3], tweet[4],word,groupId,linkToTweet,textWithLinks]
     newGroups.append(tweetWithWord)    
 #generate a dictionary given a list and an index number
 def dictionaryGen(tweetGroups,i):

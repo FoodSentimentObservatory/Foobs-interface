@@ -2,6 +2,7 @@ import DataManager.dataManager as dataManager
 import processingData.resultsFiltering as resultsFiltering
 import databaseConfigurations.config as config
 import databaseConfigurations.sqlQueries as sqlQueries
+#contains functions for fetching collection data from the db
 
 #function to retrieve all collections from all databases
 def getCollectionsFromAllDbs():

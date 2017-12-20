@@ -16,9 +16,7 @@ class Cluster:
 		for key, value in self.tweetDictionary.items():
 			if key == keyword:
 				filteredGroupOfTweets = []
-
 				for word in newKeywordGroup:
-					#print(word)
 					count = 0
 					tweetsWithWordList = []
 					for tweet in value:
@@ -27,7 +25,7 @@ class Cluster:
 						if checkIfExists==1:
 							count += checkIfExists
 							tweetTup = tweet[0]+"|"+tweet[2]+"|"+ word+"|"+key+"|"+tweet[1]+"|"+tweet[3]+"|"+tweet[4]+"|"+tweet[7]
-							tweetsTupList=(tweet[0],tweet[2],word,key,tweet[1],tweet[3],tweet[4],tweet[7])
+							tweetsTupList=(tweet[0],tweet[2],word,key,tweet[1],tweet[3],tweet[4],tweet[7], tweet[8])
 							self.filteredTweetsList.append(tweetsTupList)
 							self.filteredTweets.append(tweetTup)
 					if count>0:		

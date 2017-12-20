@@ -1,46 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link  rel="stylesheet" href="/static/css/bootstrap.css" type="text/css"/>
-    <link  rel="stylesheet" href="/static/css/styles.css" type="text/css"/>
-    <link  rel="stylesheet" href="/static/css/newStyles.css" type="text/css"/>
+    {% include "parts/headContent.html" %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src = "/static/js/bootstrap.min.js"></script>
 
   </head>
 
   <body>
-
-    <div class="se-pre-con"></div>
-      <nav class="navbar navbar-inverse">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="#">Food Sentiment Observatory</a>
-        </div>
-        <ul class="nav navbar-nav">
-          <li><a href="/index">Home</a></li>
-          <li><a href="/manual">Manual</a></li>
-          <li> <a href="/collectionsPage">Collections</a></li>
-          <li><a href="/topicVisualisationHomePage">Topic Visualisation</a></li>
-        </ul>
-      </div>
-    </nav>  
+    {% include "parts/menu.html" %}  
     <div class="container" id="mainContainer">
     
     <div class="col-sm-12" id="whitie">
       <h2>Results</h2>
       <!-- generating the tabs from a list of group data -->
-      <ul class='nav nav-tabs'>
       <h4>{{groupOriginalName}} + ..</h4>
-      {% for group in groupList %}
-          {% if group[0] == word %}
-            <li class='active'><a data-toggle='tab' href='#{{group[0]}}'>.. + {{group[0]}}</a></li>
-          {% else %}
-            <li><a data-toggle='tab' href='#{{group[0]}}'>.. + {{group[0]}}</a></li>  
-          {% endif %}  
 
-      {% endfor %}
-      </ul>    
+      {% include "parts/tabs.html" %}   
       <div class='tab-content'>   
       <!--each tab content is a separate item of a dictionary -->
       {% for key, values in dicw.items() %}
@@ -53,38 +29,21 @@
           <!-- getting data about the group size and frequent words from the group list, if there's a match with the dict key, we get the data from that sublist-->
           {% for group in groupList %}
               {% if group[0]==key %}
-
                 <form role="form" autocomplete="off" action = "/frequentKeywordSearch">
                   <input type="hidden" name="groupIdStr" value="{{group[0]}}">
                   <input type="hidden" name="groupOriginalName" value="{{group[1]}}">
                   <input type="hidden" name="group" value="{{group[4]}}">
                   <input type="hidden" name="tweets" value="{{group[5]}}">
                   <h4>There are {{group[3]}} tweets for this group of keywords.</h4>
-                  <div class='wordBubble'>
-                    <h4>Most frequent words:</h4>
-                    <p>
-                    {% for tup in group[4] %}
-                      <button type="submit" class="btn btn-success spacedButton" name="word" value="{{tup[1]}}">{{tup[1]}} <span class="badge">{{tup[0]}}</span></button>
-                    {% endfor %}  
-                    </p>
-                  </div></form>
+                  {% include "parts/frequentWords.html" %}
+                </form>
               {% endif %}    
           {% endfor %} 
         <!--Displaying the tweet content-->  
         <h4>Tweets</h4>
         <div id="groupsContent" class="col-sm-12">          
         {% for tweet in values %}  
-          <div class='col-xs-8' id='tweet'>
-            <div class='col-xs-6' id='author'>
-              {% if tweet[3]=='True' %}
-                <span style='color:#FFF;'>{{tweet[4]}}</span> <span style='color:#D3D3D3;'>@{{tweet[2]}}</span> 
-                <span class='glyphicon glyphicon-ok blue'></span>
-              {% else %}  
-                <span style='color:#FFF;'>{{tweet[4]}}</span> <span style='color:#D3D3D3;'>@{{tweet[2]}}</span> 
-              {% endif %}  
-            </div>
-            <div class='col-xs-6' id='time'>{{tweet[1]}}</div>
-            <div class='col-xs-12' id='tweetText'>{{tweet[0]}}<br></div></div>
+          {% include "parts/tweet.html" %}
         {% endfor %}
         </div>
         </div>
@@ -94,9 +53,7 @@
        </div>
     </div>
     </div>
-      <!--<footer class="footer" id="footerId">
-      <div class="container"></div>
-    </footer>-->
+      
     <script src = "/static/js/scripts.js"></script>
 
 </body>

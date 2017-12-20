@@ -3,7 +3,11 @@ import databaseConfigurations.config as config
 import html
 import re
 import processingData.resultsFiltering as resultsFiltering
+#contains function for db connection and 
+#functions for loading search and databases data for the home page
 
+#connects to the selected db, all functions that require db connection,
+#connect through here
 def startDbConnection(dbName):        
     conn = sqlQueries.connectionToDatabaseTest(dbName) 
 

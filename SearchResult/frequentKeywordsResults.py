@@ -63,7 +63,7 @@ class FrequentKeywordsResult:
 				for tweet in self.tweetDataList:
 					if freqWord in tweet[0].lower():
 						resultsFiltering.addTweetToNewGroupsList(freqWord,tweet,self.originalStringGroupId,self.newGroups)
-
+#main function to split the tweets in groups by frequent keyword
 	def returnDictionaryOfTweets(self):		
 		self.findTweetsContainingSelectedWord()
 		self.findTweetsForTheOtherFrequentWords()		
@@ -73,7 +73,7 @@ class FrequentKeywordsResult:
 		self.orderedFreqKeywordTweetDict = collections.OrderedDict(sorted(freqWordTweetsDict.items()))
 
 		return self.orderedFreqKeywordTweetDict	
-
+#returns a list of data to be used by the upper part of the frequent results page
 	def returnFrequentWordsGroupList(self):
 		groupList = []
 		i=0

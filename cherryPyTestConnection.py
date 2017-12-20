@@ -14,40 +14,41 @@ import processingData.word2vec as word2vec
 import processingData.resultsFiltering as resultsFiltering
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
-env=Environment(loader=FileSystemLoader(CUR_DIR),
+print(CUR_DIR+'/GUI/')
+env=Environment(loader=FileSystemLoader(CUR_DIR+'/GUI'),
 trim_blocks=True)
 listOfCollectionData={}
 class ServerConnection(object):
 	def __init__(self):
 		self.location=""
 		self.searchQuery=""	
-
+	#loads the homepage	
 	@cherrypy.expose
 	def index(self):
 		listOfDatabases = dataManager.getDBs() 
 		searchNotesDic = dataManager.getSearchNotes()
 		listOfAllCollections = collectionsDataManager.getCollectionsFromAllDbs()
 
-		template = env.get_template('GUI/index.html')
-		return template.render(dicw=searchNotesDic, listOfDatabases=listOfDatabases, title="something", listOfAllCollections=listOfAllCollections)
-
+		template = env.get_template('index.html')
+		return template.render(searchNotesDic=searchNotesDic, listOfDatabases=listOfDatabases, title="something", listOfAllCollections=listOfAllCollections)
+	#loads the manual page	
 	@cherrypy.expose
 	def manual(self):
-		return open('GUI/manual.html')	
+		return open('manual.html')	
 	
-	#direct towards the relevant script
+	#loads the search form if an aption from the data explorer has been selected
 	@cherrypy.expose
 	def connectToScript(self, searchnoteID, dbName, start, endof,keywords, task):
 		self.setSelfValues(searchnoteID,dbName,start,endof,keywords)
-		template = env.get_template('GUI/keywordSearch.html')
-		return template.render(startDate=self.startDate, endDate=self.endof, title="something",task=task)
-
+		template = env.get_template('keywordSearch.html')
+		return template.render(startDate=self.startDate, endDate=self.endof, task=task)
+	#loads the search form if an option from the cluster dataset menu has been selected	
 	@cherrypy.expose
 	def clusterFromDataSet(self,searchnoteIDForCluster, dbName, endof,start,keywordsCluster,task):
 		self.setSelfValues(searchnoteIDForCluster,dbName,start,endof,keywordsCluster)
-		template = env.get_template('GUI/keywordSearch.html')
-		return template.render(startDate=self.startDate, endDate=self.endof, title="something",task=task)
-
+		template = env.get_template('keywordSearch.html')
+		return template.render(startDate=self.startDate, endDate=self.endof, task=task)
+	#sets the class values	
 	def setSelfValues(self,searchNote,dbName,start,endof, keywords):
 		self.location = searchNote.split("-")[0]
 		self.searchQuery = searchNote.split("- ")[1]
@@ -55,7 +56,7 @@ class ServerConnection(object):
 		self.startDate = start
 		self.endof = endof	
 		self.keywordsOfSearch = keywords
-	#script for keyword searches
+	#script for data explorer search, displays the result page
 	@cherrypy.expose	
 	def keywordSearch(self, group, checkName,fromDate,toDate, dbName,checkIfKeywords):
 		self.fromDate = fromDate
@@ -68,18 +69,19 @@ class ServerConnection(object):
 		groupList = searchResult.getGroupList()
 		queryDataList = searchResult.getQueryData()
 		
-		template = env.get_template('GUI/results.html')
+		template = env.get_template('results.html')
 		return template.render(dicw=tweetDictionary, listOfCollections=listOfCollections, groupList=groupList, i=0, queryData = queryDataList)
 
-	#calling the frequent keywords module	
+	#script for the frequent keywords search	
 	@cherrypy.expose	
 	def frequentKeywordSearch(self,group, tweets, word,groupIdStr,groupOriginalName):
 		frequentWordResult = frequentKeywordsResult.FrequentKeywordsResult(group, tweets, word,groupIdStr,groupOriginalName)
 		orderedFreqKeywordTweetDict = frequentWordResult.returnDictionaryOfTweets()
 		groupList = frequentWordResult.returnFrequentWordsGroupList()
 
-		template = env.get_template('GUI/freqResults.html')
+		template = env.get_template('freqResults.html')
 		return template.render(dicw=orderedFreqKeywordTweetDict, groupOriginalName=groupOriginalName, groupList=groupList, word=word)	
+	#loads the cluster form page	
 	@cherrypy.expose
 	def specifyClusterParams(self, fromDate,toDate,dbName,checkIfKeywords, group, checkName):
 		self.fromDate = fromDate
@@ -87,9 +89,9 @@ class ServerConnection(object):
 		self.dbName = dbName
 		self.group = group
 		print(self.keywordsOfSearch)
-		template = env.get_template('GUI/clusterSpecForm.html')
+		template = env.get_template('clusterSpecForm.html')
 		return template.render(keywords=self.keywordsOfSearch, keywordGroups = self.group)
-
+	#saves or updates a collection	
 	@cherrypy.expose
 	def saveCollection(self,collectionId, collectionName, collectionDescription, dbName, dateOfCreation, groupOfKeywords):
 		self.dbName=dbName	
@@ -104,9 +106,9 @@ class ServerConnection(object):
 
 		conn.close()
 
-		template = env.get_template('GUI/collectionsPage.html')
+		template = env.get_template('collectionsPage.html')
 		return template.render(collectionsList=collectionsList,paramsList=paramsList)
-
+	#loads the collections page	
 	@cherrypy.expose	
 	def collectionsPage(self):
 		conn = dataManager.startDbConnection(self.dbName)	
@@ -118,9 +120,9 @@ class ServerConnection(object):
 
 		conn.close()
 
-		template = env.get_template('GUI/collectionsPage.html')
+		template = env.get_template('collectionsPage.html')
 		return template.render(collectionsList=collectionsList, paramsList=paramsList, dbName=self.dbName)
-
+	#updates a collection on click of update button in the collections page	
 	@cherrypy.expose
 	def updateCollection(self, collectionId, timeStamp, nameOfProject, descriptionOfProject,keywordGroups):
 		conn = dataManager.startDbConnection(self.dbName)	
@@ -134,9 +136,9 @@ class ServerConnection(object):
 
 		conn.close()
 
-		template = env.get_template('GUI/collectionsPage.html')
+		template = env.get_template('collectionsPage.html')
 		return template.render(collectionsList=collectionsList,paramsList=paramsList)	
-	
+	#deletes a collection on click of the delete button in the collections page
 	@cherrypy.expose
 	def deleteCollection(self, collectionToDeleteId):
 		conn = dataManager.startDbConnection(self.dbName)	
@@ -150,9 +152,9 @@ class ServerConnection(object):
 
 		conn.close()
 
-		template = env.get_template('GUI/collectionsPage.html')
+		template = env.get_template('collectionsPage.html')
 		return template.render(collectionsList=collectionsList,paramsList=paramsList)	
-
+	#shows a collection on the click of the show collection button in the collections page	
 	@cherrypy.expose	
 	def showCollection(self, collectionToShowId):
 		conn = dataManager.startDbConnection(self.dbName)	
@@ -165,20 +167,10 @@ class ServerConnection(object):
 
 		conn.close()
 
-		template = env.get_template('GUI/displayCollection.html')
+		template = env.get_template('displayCollection.html')
 		return template.render(groupOfParameters=groupOfParameters, collectionDictionary=collectionDictionary, collectionName=collectionName)	
 
-
-	#@cherrypy.expose
-	#def visualiseCollectionsFromIndexPage(self,inputTypes, dbName, start, endof,keywords,twoCollectionId, collectionRow):
-		#html = visualiseCollections(twoCollectionId,self.location,self.searchQuery,self.fromDate, self.toDate)
-		#return html
-
-	#@cherrypy.expose
-	#def visualiseCollectionsFromCollectionsPage(self, twoCollectionId):
-		#html = visualiseCollections(twoCollectionId)
-		#return html
-
+	#loads scatter text on selection of two collections, both from collections page and home page	
 	@cherrypy.expose	
 	def visualiseCollections(self, twoCollectionId, dbName):
 			conn = dataManager.startDbConnection(dbName)	
@@ -196,7 +188,7 @@ class ServerConnection(object):
 
 		conn.close()
 
-		template = env.get_template('GUI/topicHomePage.html')
+		template = env.get_template('topicHomePage.html')
 		return template.render(collectionsList=collectionsList)	
 
 	@cherrypy.expose							
@@ -210,7 +202,8 @@ class ServerConnection(object):
 		runJst.runJst(collectionIdToShow, numberOfTopics, numberOfTopicWords)
 
 		fileFunctions.readJSTResultFiles()
-
+	#loads the donut for a selected keyword from the clusters stats page
+	#works by filtering the already created result dictionary to search for the selected keyword	
 	@cherrypy.expose	
 	def generateClusters(self,keyword):		
 		cluster = donutVis.Cluster(self.tweetDictionary)
@@ -218,9 +211,10 @@ class ServerConnection(object):
 		tweetsOfClustersStr = cluster.tweetsString
 		tweetsOfClustersList = cluster.filteredTweetsList
 		
-		template = env.get_template('GUI/clusters.html')
+		template = env.get_template('clusters.html')
 		return template.render(clustersList=clusteredTweetsDicts, tweetsOfClusters=tweetsOfClustersStr,tweetsOfClustersList=tweetsOfClustersList)
-
+	#searches for tweets for the selected cluster and segment keywords
+	#loads clusters stats page	
 	@cherrypy.expose	
 	def createClusters(self, keywordsToCluster, keywordsForSegments, enrichKeywords):	
 		keywordClusterList = resultsFiltering.createKeywordList(keywordsToCluster,',')	
@@ -249,7 +243,7 @@ class ServerConnection(object):
 		else:
 			check = 1
 
-		template = env.get_template('GUI/clustersStatsPage.html')
+		template = env.get_template('clustersStatsPage.html')
 		return template.render(countsList = listOfCounts,listOfResultParameters=listOfResultParameters,keywordsWithNoResults=keywordsWithNoResults,check=check)	
 
 	

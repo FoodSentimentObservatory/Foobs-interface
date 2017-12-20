@@ -2,27 +2,12 @@
 <html>
 
 	<head>
-		<link  rel="stylesheet" href="/static/css/bootstrap.css" type="text/css"/>
-		<link  rel="stylesheet" href="/static/css/styles.css" type="text/css"/>
-		<link  rel="stylesheet" href="/static/css/newStyles.css" type="text/css"/>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-		<script src = "/static/js/bootstrap.min.js"></script>
+		{% include "parts/headContent.html" %}
+		<title>FoObs Home</title>
 	</head>
 
 	<body>
-	<div class="se-pre-con"></div>
-		<nav class="navbar navbar-inverse">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="#">Food Sentiment Observatory</a>
-        </div>
-        <ul class="nav navbar-nav">
-          <li class="active"><a href="/index">Home</a></li>
-          <li><a href="/manual">Manual</a></li>
-         
-        </ul>
-      </div>
-    </nav> 
+		{% include "parts/menuIndexPage.html" %} 
 
 		<div class="container" id="mainContainer"> 
 			<div id="whitie">
@@ -68,7 +53,7 @@
 								 <div id="filterKeywords" class="collapse">
 								 	<div class="panel-body">
 							            <h4>Choose a search</h4>
-							            {% for key, values in dicw.items() %}
+							            {% for key, values in searchNotesDic.items() %}
 							            <div id="{{key}}" class="setVisibility">
 							            	{% for v in values %}
 							                <div class="funkyradio-success">
@@ -139,7 +124,7 @@
 	                                    </a></h4></div>
 	                                    <div id="selectedDataSource" class="collapse">
 	                                        <div class="panel-body">
-	                                        	{% for key, values in dicw.items() %}
+	                                        	{% for key, values in searchNotesDic.items() %}
 									            <div id="{{values[0][15]}}" class="setVisibility">
 									            	{% for v in values %}
 									                <div class="funkyradio-success">
@@ -170,13 +155,7 @@
 				
 			</div>
 	</div>	
-
-	<!--<footer class="footer" id="footerId">
-      <div class="container"> 
-        
-      </div>
-    </footer>-->
-
+	<script src = "/static/js/bootstrap.min.js"></script>
     <script src = "/static/js/scripts.js"></script>
 	<script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBiDjEvKnfBfWVueTpAkF1jjLWQCy-LSSw&callback=initMap">
