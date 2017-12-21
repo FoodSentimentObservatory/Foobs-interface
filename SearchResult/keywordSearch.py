@@ -36,18 +36,7 @@ class SearchResult:
 		self.tweets=tweetsDataManager.fetchingTweetsContainingGroups(self.cursor,self.location,self.searchQuery,self.listOfGroups, self.fromDate, self.toDate)
 		self.conn.close()
 		i=0
-		tweetList=[]
-
-		#for each group of tweets (all tweets fetched for one group of keywords)
-		for groupOfTweets in self.tweets:
-			for tweet in groupOfTweets:
-				tweetL = list(tweet)
-				#making links clickable
-				text = resultsFiltering.clickableLinks(tweetL[0])
-				tweetL.append(text)
-				#sending the tweets to a list
-				tweetList.append(tweetL)
-
+		tweetList=resultsFiltering.addClickableLinks(self.tweets)
 		index=5
 		tweetDictionary = resultsFiltering.dictionaryGen(tweetList,index)
 

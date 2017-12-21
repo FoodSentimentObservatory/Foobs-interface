@@ -52,7 +52,7 @@ def groupSearch(cursor, location,searchQuery, group, fromDate, toDate):
 
 def getTweetsList(cursor,keywordGroup, searchQuery, location, fromDate, toDate):
     resultsList = []
-    #for eah word, fetch all tweets containing the word
+    #for each word, fetch all tweets containing the word
     if keywordGroup != 'all tweets':
         for word in keywordGroup:
             word = resultsFiltering.replaceChars("+", " ", word)

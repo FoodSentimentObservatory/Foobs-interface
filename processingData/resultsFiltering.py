@@ -112,7 +112,7 @@ def makeAStringOfKeywordGroups(parametersDictionary):
             paramsList.append(paramsSublist)
 
         return paramsList    
-
+#replaces new lines in tweets with a space
 def removeHtmlChars(text):
     textNoNewLines = replaceChars("\n", " ", text)
     textNoHtmlChars=html.escape(textNoNewLines,quote=True)  
@@ -129,7 +129,8 @@ def findKeywordsInText(text, keywordGroup):
         checkIfExists = findWordInText(word, alreadySeenWords, text)
         count += checkIfExists         
     return count   
-
+#searches for word in text, the word cannot be part of a bigger word
+#but the regex matches hashtags and punctuation signs
 def findWordInText(word, alreadySeenWords, text):
     count = 0
     regex = r'\b'+word.strip()+'\\b'
@@ -140,7 +141,7 @@ def findWordInText(word, alreadySeenWords, text):
         count=1 
   
     return count         
-
+#checks if a user is verified
 def checkIfVerified(verifiedValue):
     if verifiedValue==False:
         verified="False"
@@ -148,7 +149,10 @@ def checkIfVerified(verifiedValue):
         verified="True"  
 
     return verified   
-
+#takes the group input that has been given by the user in the
+#keywordSearch page and makes into a list. If the input is equal to:
+#'no groups', the list only contains the phrase all tweets, which means
+#that the rest of the code will ignore the keyword input
 def splitStrOfGroups(group):
     listOfGroups = []
     if isinstance(group, str):
@@ -178,7 +182,9 @@ def addNewKeywordGroups(group, keywordsToCluster):
             newKeywordGroupList.append(newKeywordGroup)
 
     return newKeywordGroupList    
-
+#if keyword groups have been specified by the user in the keywordSearch page
+#when clustering has been selected as a function, the keyword groups are turned
+#into a readable logical string here to be displayed on the clustersStatsPage
 def getKeywordContraintString(group):
     listOfGroups = splitStrOfGroups(group)
     intermediateListOfGroups = []
@@ -189,16 +195,32 @@ def getKeywordContraintString(group):
     listOfGroupsStr = '; '.join(intermediateListOfGroups)
 
     return listOfGroupsStr    
-
+#generates a link for the tweet on twitter
 def getTwitterLink(tweetId,userHandle):
     twitterLink = "https://twitter.com/"+userHandle+"/status/"+str(tweetId)
 
     return twitterLink    
-
+#function to split a string into a list, takes split character as a variable
+#as different strings can be split by different characters
 def createKeywordList(keywords, splitChar):
     if isinstance(keywords, str):
         keywordList = keywords.split(splitChar)
     else:
         keywordList=keywords 
 
-    return keywordList       
+    return keywordList      
+#adds clickable links to each tweet list for display
+def addClickableLinks(tweets):
+    tweetList=[]
+
+    #for each group of tweets (all tweets fetched for one group of keywords)
+    for groupOfTweets in tweets:
+        for tweet in groupOfTweets:
+            tweetL = list(tweet)
+            #making links clickable
+            text = clickableLinks(tweetL[0])
+            tweetL.append(text)
+            #sending the tweets to a list
+            tweetList.append(tweetL)
+
+    return tweetList             
