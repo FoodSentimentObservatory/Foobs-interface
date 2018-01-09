@@ -8,6 +8,7 @@
       <div class="modal-body">
         <input type='checkbox' name='keywordEnrichments' id='keywordEnrichments' value='enrich'>Enrich keywords
         <form action = "/createClusters" name="kgroupForm" onsubmit="validateClusterForm()">
+        <input type="hidden" name="task" value="dataset">
         <div class="keywordGroup col-sm-8"> 
           <div class="entry input-group col-xs-12 ui-widget unstyled">
             <input type="hidden" name="keywordsToCluster" id="keywordsToCluster" value="" />

@@ -12,6 +12,8 @@ class Cluster:
 		self.tweetsString = ""
 #function that creates the string lists that will be used to display the donut
 	def clusterKeywords(self,newKeywordGroup, keyword):
+		print(newKeywordGroup)
+		print(keyword)
 		listOfDicts = []
 		for key, value in self.tweetDictionary.items():
 			#only matches to the key that is the same as the selected word
@@ -47,8 +49,12 @@ class Cluster:
 							#this is a stringified version of the list, which will be passed to the javaScript
 							#in order to filter the tweets onclick of a segment
 							self.filteredTweets.append(tweetTup)
-					if count>0:		
-						wordTup = wordStr+"|"+key+"|"+str(count)
+					if count>0:
+						if "," in key:
+							keyStr = key.replace(",", " AND ")	
+						else:
+							keyStr = key		
+						wordTup = wordStr+"|"+keyStr+"|"+str(count)
 						print(wordTup)		
 						filteredGroupOfTweets.append(wordTup)
 				index = 1	
@@ -69,8 +75,10 @@ class Cluster:
 	def getCounts(self,keywordsForSegmentsList):	
 		listOfCounts=[]
 		for key, value in self.tweetDictionary.items():
+			print(key)
 			countOftweets=0
 			for word in keywordsForSegmentsList:
+				print(word)
 				for v in value:
 					alreadySeenWords=[]
 					if isinstance(word, str):
@@ -79,11 +87,13 @@ class Cluster:
 					else:
 						count = resultsFiltering.findKeywordsInText(v[0], word)	
 						if count==len(word):
-							countOftweets += 1
+							countOftweets += 1	
 			#if there are any tweets with any of the segment keywords, add to the count list			
 			if countOftweets>0:		
 				countTup = (key, countOftweets, v[6])
 				listOfCounts.append(countTup)
+				print(countTup)
+			print("---------------")	
 		#ordering the final count list by count of tweets
 		orderedListOfCounts = sorted(listOfCounts, key=itemgetter(1), reverse=True)
 
@@ -95,15 +105,18 @@ class Cluster:
 		keywordsWithNoResults = []
 		for word in keywordsToClusterEnriched:
 			count = 0
-			for tup in listOfCounts:
-				if isinstance(word,list):
-					wordStr = ','.join(word)
-				else:
-					wordStr = word	
+			if isinstance(word,list):
+				wordStr = ','.join(word)
+			else:
+				wordStr = word
+
+			for tup in listOfCounts:				
 				if wordStr == tup[2]:
 					count += 1
+
 			if count == 0:
 				keywordsWithNoResults.append(wordStr)
+
 		if len(keywordsWithNoResults)>0:		
 			keywordsWithNoResults.sort()				
 

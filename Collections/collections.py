@@ -16,28 +16,32 @@ class Collection():
 	def saveCollection(self, collectionName, collectionDescription, dateOfCreation, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetsCount):
 		checkIfExists = collectionsDataManager.searchForCollection(self.cursor,self.collectionId)
 		if len(checkIfExists)>0:
+			#if collection exists, update entries in database and add the parameter tweet count to the total count of the collection
 			collectionsDataManager.updateExistingCollection(self.cursor, self.collectionId, collectionName, collectionDescription,dateOfCreation)
 			collectionsDataManager.setTotalTweetCountOfACollection(self.cursor, tweetsCount, self.collectionId)
 		else:
+			#create a new collection and the parameter tweet count is the total count of the collection
 			collectionsDataManager.createNewCollection(self.cursor, self.collectionId, collectionName, collectionDescription,dateOfCreation, tweetsCount)	
 
 		self.idOfCollection = collectionsDataManager.getCollectionId(self.cursor,self.collectionId)
-		collectionsDataManager.saveCollectionParameters(self.cursor, self.idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetsCount)	
+		#save the collection parameter entry in the database
+		collectionsDataManager.saveCollectionParameters(self.cursor, self.idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetsCount)
+
 	#updates a collection, triggered by the update modal on the collections page
 	#if specified any, removes parameters for the given collection	
 	def updateCollection(self, collectionId, timeStamp, nameOfProject, descriptionOfProject,keywordGroups):		
-			if isinstance(keywordGroups, str):
-				listOfKeywordGroups = [keywordGroups]
-			else:
-				listOfKeywordGroups=keywordGroups	
+		if isinstance(keywordGroups, str):
+			listOfKeywordGroups = [keywordGroups]
+		else:
+			listOfKeywordGroups=keywordGroups	
 			
-			for group in listOfKeywordGroups:
-				print(str(group))
-				countOfTweets = collectionsDataManager.getParameterTweetCount(self.cursor, str(self.idOfCollection), group)
-				collectionsDataManager.decreaseTotalTweetCountOfACollection(self.cursor, countOfTweets, self.collectionId)
-				collectionsDataManager.deleteASpecificParameter(self.cursor, str(self.idOfCollection), group)
+		for group in listOfKeywordGroups:
+			print(str(group))
+			countOfTweets = collectionsDataManager.getParameterTweetCount(self.cursor, str(self.idOfCollection), group)
+			collectionsDataManager.decreaseTotalTweetCountOfACollection(self.cursor, countOfTweets, self.collectionId)
+			collectionsDataManager.deleteASpecificParameter(self.cursor, str(self.idOfCollection), group)
 
-			collectionsDataManager.updateExistingCollection(self.cursor, self.collectionId, nameOfProject, descriptionOfProject,timeStamp)
+		collectionsDataManager.updateExistingCollection(self.cursor, self.collectionId, nameOfProject, descriptionOfProject,timeStamp)
 	#deletes a collection from the collections table and its parameters from the parametersForCollections table		
 	def deleteACollection(self):
 		collectionsDataManager.deleteAllParametersOfACollection(self.cursor, str(self.idOfCollection))	
@@ -79,12 +83,12 @@ class Collection():
 		print(paramsList)
 
 		return paramsList
-
+	#fetch all parameters for a given collection
 	def getAllCollectionParamters(self):		
 		listOfCollectionParameters = collectionsDataManager.getParametersOfCollection(self.cursor, str(self.idOfCollection))
 
 		return listOfCollectionParameters
-
+	#only get the keywords from the parameters of a given collection	
 	def getAllCollectionParametersKeywords(self):
 		listOfCollectionParameters = self.getAllCollectionParamters()
 

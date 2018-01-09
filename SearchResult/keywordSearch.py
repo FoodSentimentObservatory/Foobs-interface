@@ -84,17 +84,21 @@ class SearchResult:
 	def filterTweets(self, keywordsToClusterEnriched):
 		tweetsDictionary = self.retrieveTweets()
 		newListOfTweets = []
-		
 		for key, value in tweetsDictionary.items():
 			for tweet in value:
 				for word in keywordsToClusterEnriched:
-					alreadySeenWords=[]
-					count = resultsFiltering.findWordInText(word, alreadySeenWords, tweet[0])
-					if count>0:
-						newTweetList = [tweet[0],tweet[1],tweet[2],tweet[3],tweet[4],tweet[5],tweet[6], word]
-						newListOfTweets.append(newTweetList)
+					if word != "":
+						if "," in word:
+							wordList = word.split(",")
+						else:
+							wordList = [word]	
+						alreadySeenWords=[]
+						count = resultsFiltering.findKeywordsInText(tweet[0], wordList)
+						if count==len(wordList):
+							newTweetList = [tweet[0],tweet[1],tweet[2],tweet[3],tweet[4],tweet[5], word, tweet[7], tweet[8]]
+							newListOfTweets.append(newTweetList)
 
-		index = 7
+		index = 6
 		newTweetsDictionary = resultsFiltering.dictionaryGen(newListOfTweets,index)
 
 		return 	newTweetsDictionary				

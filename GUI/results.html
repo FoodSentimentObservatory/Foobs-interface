@@ -49,8 +49,8 @@
                 {% for groupQueryData in queryData %}  
                   {% if groupQueryData[0] == group[0] %}
                   <div class="col-xs-6">
-                    <button type="button" class="btn icon-btn btn-success smallButton" data-toggle="modal" data-target="#clustersModal" onclick="setHiddenValues('{{groupQueryData[1]}}', '{{groupQueryData[2]}}', '{{groupQueryData[3]}}', '{{groupQueryData[4]}}', '{{groupQueryData[5]}}')">
-                      <span class="glyphicon btn-glyphicon glyphicon-signal img-circle text-success">\</span>Cluster the results for <strong>{{group[1]}}</strong>
+                    <button type="button" class="btn icon-btn btn-warning smallButton" data-toggle="modal" data-target="#clustersModal" onclick="setHiddenValues('{{groupQueryData[1]}}', '{{groupQueryData[2]}}', '{{groupQueryData[3]}}', '{{groupQueryData[4]}}', '{{groupQueryData[5]}}')">
+                      <span class="glyphicon btn-glyphicon glyphicon-signal img-circle text-warning">\</span>Cluster the results for <strong>{{group[1]}}</strong>
                     </button>
                   </div>
                   {% endif %}
@@ -71,7 +71,7 @@
         </div>
         
         </div>
-
+        
        {% endfor %}
        </form>
        </div>
