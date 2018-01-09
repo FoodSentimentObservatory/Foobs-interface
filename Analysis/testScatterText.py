@@ -7,19 +7,20 @@ from scattertext import produce_scattertext_explorer
 import pandas as pd
 import numpy as np
 import json
-import databaseConfigurations.sqlQueries as sqlQueries
+import DataManager.collectionsDataManager as collectionsDataManager
 import DataManager.tweetsDataManager as tweetsDataManager
 import processingData.fileFunctions as fileFunctions
-
+#gets all the data it needs for the two collections and sets it into a format that can
+#be processed by the scatter text method.
 def visualiseCollections(cursor, twoCollectionId):
 	idsForVis = twoCollectionId.split(',')
 	listOfDataForVis = []
 	listOfCollectionNames = []
 	for uniqueId in idsForVis:
-		idOfCollection = sqlQueries.getCollectionId(cursor, uniqueId)
+		idOfCollection = collectionsDataManager.getCollectionId(cursor, uniqueId)
 
-		listOfCollectionParameters = sqlQueries.getParametersOfCollection(cursor, str(idOfCollection))
-		collectionName = sqlQueries.getCollectionName(cursor, uniqueId)
+		listOfCollectionParameters = collectionsDataManager.getParametersOfCollection(cursor, str(idOfCollection))
+		collectionName = collectionsDataManager.getCollectionName(cursor, uniqueId)
 		listOfCollectionNames.append(collectionName)
 		tweets=[]
 		for parameter in listOfCollectionParameters:
@@ -40,7 +41,7 @@ def visualiseCollections(cursor, twoCollectionId):
 	html = generateScatterText(jsonTweetData, listOfCollectionNames)
 
 	return html	
-
+#actually generates the html for the page
 def generateScatterText(data, listOfCollectionNames):
 	collectionOne = listOfCollectionNames[0]
 	collectionTwo = listOfCollectionNames[1]

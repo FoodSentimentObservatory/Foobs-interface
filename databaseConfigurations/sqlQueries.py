@@ -133,9 +133,9 @@ def updateCollectionEntry(cursor, collectionIds, collectionNames, collectionDesc
     cursor.execute("UPDATE [Collections] SET [Description] = '%s', [collectionName] = '%s', [lastUpdated] = '%s' WHERE [uniqueIdentifier] = '%s'"%(collectionDescriptions,collectionNames,dateOfCreation,collectionIds))
     print("entry updated")    
 #creates a new collection
-def createANewCollectionEntry(cursor, collectionIds, collectionNames, collectionDescriptions,dateOfCreation):
-    sql = "INSERT INTO [Collections] ([Description],[uniqueIdentifier],[collectionName],[dateCreated]) VALUES (%s,%s,%s,%s)" 
-    cursor.execute(sql,(collectionDescriptions,collectionIds,collectionNames,dateOfCreation))
+def createANewCollectionEntry(cursor, collectionIds, collectionNames, collectionDescriptions,dateOfCreation, tweetCount):
+    sql = "INSERT INTO [Collections] ([Description],[uniqueIdentifier],[collectionName],[dateCreated], [totalTweetCount]) VALUES (%s,%s,%s,%s,%d)" 
+    cursor.execute(sql,(collectionDescriptions,collectionIds,collectionNames,dateOfCreation,int(tweetCount)))
     print("entry created")    
 #deletes a collection
 def deleteCollectionEntry(cursor, collectionId):
@@ -160,9 +160,9 @@ def getCollectionName (cursor, uniqueId):
         
     return collectionNameStr  
 #saves query parameters to database
-def saveQueryParameters(cursor, collectionId, keywords, searchQuery, location, fromDate, toDate):
-    sql = "INSERT INTO [ParametersForCollections] ([keywords], [searchQuery], [location], [fromDate], [toDate], [collectionId]) VALUES (%s,%s,%s,%s,%s,%s)"
-    cursor.execute(sql,(keywords,searchQuery,location,fromDate,toDate,collectionId))
+def saveQueryParameters(cursor, collectionId, keywords, searchQuery, location, fromDate, toDate, tweetCount):
+    sql = "INSERT INTO [ParametersForCollections] ([keywords], [searchQuery], [location], [fromDate], [toDate], [collectionId], [countOfTweets]) VALUES (%s,%s,%s,%s,%s,%s,%d)"
+    cursor.execute(sql,(keywords,searchQuery,location,fromDate,toDate,collectionId, int(tweetCount)))
     print("new keyword group created.")
 #retrieves all parameters for a given collection
 def getParametersOfCollection(cursor, collectionId):
@@ -190,3 +190,19 @@ def getCollectionId (cursor, collectionUniqueId):
 
     return collectionId    
 
+def setTotalTweetCountOfACollection(cursor, tweetCount, collectionID):
+    cursor.execute("UPDATE [Collections] SET [totalTweetCount] = [totalTweetCount] + '"+tweetCount+"' WHERE [uniqueIdentifier] = '"+collectionID+"'")
+
+    print("count updated")
+
+def decreaseTotalTweetCountOfACollection(cursor, tweetCount, collectionID):
+    print(tweetCount)
+    cursor.execute("UPDATE [Collections] SET [totalTweetCount] = [totalTweetCount] - '"+tweetCount+"' WHERE [uniqueIdentifier] = '"+collectionID+"'")
+
+def getParameterTweetCount(cursor, uniqueIdentifier, keywordGroup):
+    cursor.execute("SELECT [countOfTweets] FROM [ParametersForCollections] WHERE [collectionId]='"+uniqueIdentifier+"' AND [keywords] ='"+keywordGroup+"'")
+    countOfTweetsList = cursor.fetchall() 
+    countOfTweets = str(countOfTweetsList[0][0])
+    print(countOfTweets)
+
+    return countOfTweets   

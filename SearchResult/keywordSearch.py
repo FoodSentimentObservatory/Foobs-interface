@@ -1,8 +1,8 @@
-import databaseConfigurations.sqlQueries as sqlQueries
 import DataManager.dataManager as dataManager
 import processingData.resultsFiltering as resultsFiltering
 import DataManager.tweetsDataManager as tweetsDataManager
 import Analysis.frequencyCount as frequencyCount
+import DataManager.collectionsDataManager as collectionsDataManager
 
 class SearchResult:		
 	def __init__(self, group,fromDate,toDate, dbName, location, searchQuery):
@@ -23,7 +23,7 @@ class SearchResult:
 		return conn
 #retrieves all collections from db and passes it to controller		
 	def listOfCollections(self):	
-		listOfCollections = sqlQueries.getExistingCollections(self.cursor)
+		listOfCollections = collectionsDataManager.getExistingCollections(self.cursor)
 		return listOfCollections
 #splits the string input of keywords into a list of lists
 	def listOfGroups(self):

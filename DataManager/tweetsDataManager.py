@@ -49,7 +49,7 @@ def groupSearch(cursor, location,searchQuery, group, fromDate, toDate):
     print ("-------------------------------------S")
 
     return groupTweetsResult
-
+#fetching all tweets for each word in a group of keywords
 def getTweetsList(cursor,keywordGroup, searchQuery, location, fromDate, toDate):
     resultsList = []
     #for each word, fetch all tweets containing the word
@@ -59,10 +59,11 @@ def getTweetsList(cursor,keywordGroup, searchQuery, location, fromDate, toDate):
             print (word)
             result = sqlQueries.locationQueryKeyword(cursor, word,searchQuery, location, fromDate, toDate)
             print(len(result))
-            
+            #we loop through the results so that we can avoid having a list of lists of tweets
             for r in result:
                 resultsList.append(r)
-                   
+    #if no keyword groups specified, fetch all tweets from the selected search, in the given timeframe
+    #by default the timeframe is first tweet to last tweet               
     else:
         resultsList=sqlQueries.retrieveAllTweetsFromTimeframe(cursor,searchQuery, location, fromDate, toDate)             
 

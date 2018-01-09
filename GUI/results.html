@@ -36,6 +36,7 @@
                 {% else %}
                 <input type="hidden" name="groupOriginalName" id="groupOriginalName" value="">
                 {% endif %}
+                <input type="hidden" name="numberOfTweets" id="numberOfTweets" value="{{group[3]}}">
                 <input type="hidden" name="group" value="{{group[4]}}">
                 <input type="hidden" name="tweets" value="{{group[5]}}">
                 <div class="col-xs-4"><h4>There are {{group[3]}} tweets for this group of keywords.</h4></div>
@@ -57,8 +58,6 @@
                 </div>
                 {% include "parts/frequentWords.html" %}
               </form>
-                 
-
             {% endif %}  
           {% endfor %} 
         <!--Displaying the tweet content-->  
@@ -78,6 +77,7 @@
        </div>
     </div>
     </div>
+    {% include "parts/modals/noResultsAlertModal.html" %}
      {% include "parts/modals/saveToCollectionModal.html" %}
       
      {% include "parts/modals/clusterResultsModal.html" %} 

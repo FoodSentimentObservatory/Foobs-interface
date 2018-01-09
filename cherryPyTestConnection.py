@@ -14,7 +14,6 @@ import processingData.word2vec as word2vec
 import processingData.resultsFiltering as resultsFiltering
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
-print(CUR_DIR+'/GUI/')
 env=Environment(loader=FileSystemLoader(CUR_DIR+'/GUI'),
 trim_blocks=True)
 listOfCollectionData={}
@@ -56,6 +55,9 @@ class ServerConnection(object):
 		self.startDate = start
 		self.endof = endof	
 		self.keywordsOfSearch = keywords
+
+		self.conn = dataManager.startDbConnection(self.dbName)	
+		self.cursor = self.conn.cursor()
 	#script for data explorer search, displays the result page
 	@cherrypy.expose	
 	def keywordSearch(self, group, checkName,fromDate,toDate, dbName,checkIfKeywords):
@@ -68,7 +70,7 @@ class ServerConnection(object):
 		tweetDictionary = searchResult.retrieveTweets()
 		groupList = searchResult.getGroupList()
 		queryDataList = searchResult.getQueryData()
-		
+
 		template = env.get_template('results.html')
 		return template.render(dicw=tweetDictionary, listOfCollections=listOfCollections, groupList=groupList, i=0, queryData = queryDataList)
 
@@ -90,82 +92,70 @@ class ServerConnection(object):
 		self.group = group
 		print(self.keywordsOfSearch)
 		template = env.get_template('clusterSpecForm.html')
-		return template.render(keywords=self.keywordsOfSearch, keywordGroups = self.group)
+		return template.render(keywords=self.keywordsOfSearch, keywordGroups = self.group, task="dataset")
+	@cherrypy.expose	
+	def collectionClusterParams(self, collectionId,dbName):
+		self.dbName=dbName	
+		self.collectionId = collectionId
+		self.conn = dataManager.startDbConnection(self.dbName)	
+		self.cursor = self.conn.cursor()
+		self.group = 'no groups'
+		collectionsObject = collections.Collection(collectionId,self.cursor)	
+		self.collectionParameters = collectionsObject.getAllCollectionParametersKeywords()
+
+		template = env.get_template('clusterSpecForm.html')
+		return template.render(keywords='n', keywordGroups = self.collectionParameters, task="collection")
+
 	#saves or updates a collection	
 	@cherrypy.expose
-	def saveCollection(self,collectionId, collectionName, collectionDescription, dbName, dateOfCreation, groupOfKeywords):
-		self.dbName=dbName	
-		conn = dataManager.startDbConnection(self.dbName)	
-		cursor = conn.cursor()
-
-		collectionsObject = collections.Collection(collectionId,cursor)
-		collectionsObject.saveCollection(collectionName, collectionDescription, dateOfCreation, groupOfKeywords, self.searchQuery, self.location, self.fromDate, self.toDate)
+	def saveCollection(self,collectionId, collectionName, collectionDescription, dbName, dateOfCreation, groupOfKeywords,tweetsCount):
+		collectionsObject = collections.Collection(collectionId,self.cursor)
+		collectionsObject.saveCollection(collectionName, collectionDescription, dateOfCreation, groupOfKeywords, self.searchQuery, self.location, self.fromDate, self.toDate, tweetsCount)
 
 		collectionsList = collectionsObject.getAllCollections()
 		paramsList = collectionsObject.getAllParameters()
-
-		conn.close()
 
 		template = env.get_template('collectionsPage.html')
 		return template.render(collectionsList=collectionsList,paramsList=paramsList)
 	#loads the collections page	
 	@cherrypy.expose	
 	def collectionsPage(self):
-		conn = dataManager.startDbConnection(self.dbName)	
-		cursor = conn.cursor()
-
-		collectionsObject = collections.Collection("S",cursor)
+		collectionsObject = collections.Collection("S",self.cursor)
 		collectionsList = collectionsObject.getAllCollections()
 		paramsList = collectionsObject.getAllParameters()
-
-		conn.close()
 
 		template = env.get_template('collectionsPage.html')
 		return template.render(collectionsList=collectionsList, paramsList=paramsList, dbName=self.dbName)
 	#updates a collection on click of update button in the collections page	
 	@cherrypy.expose
 	def updateCollection(self, collectionId, timeStamp, nameOfProject, descriptionOfProject,keywordGroups):
-		conn = dataManager.startDbConnection(self.dbName)	
-		cursor = conn.cursor()
-		
-		collectionsObject = collections.Collection(collectionId,cursor)
+		print(keywordGroups)
+		collectionsObject = collections.Collection(collectionId,self.cursor)
 		collectionsObject.updateCollection(collectionId, timeStamp, nameOfProject, descriptionOfProject,keywordGroups)
 
 		collectionsList = collectionsObject.getAllCollections()
 		paramsList = collectionsObject.getAllParameters()
-
-		conn.close()
 
 		template = env.get_template('collectionsPage.html')
 		return template.render(collectionsList=collectionsList,paramsList=paramsList)	
 	#deletes a collection on click of the delete button in the collections page
 	@cherrypy.expose
 	def deleteCollection(self, collectionToDeleteId):
-		conn = dataManager.startDbConnection(self.dbName)	
-		cursor = conn.cursor()
-
-		collectionsObject = collections.Collection(collectionToDeleteId,cursor)		
+		collectionsObject = collections.Collection(collectionToDeleteId,self.cursor)		
 		collectionsObject.deleteACollection()
 
 		collectionsList = collectionsObject.getAllCollections()
 		paramsList = collectionsObject.getAllParameters()
-
-		conn.close()
 
 		template = env.get_template('collectionsPage.html')
 		return template.render(collectionsList=collectionsList,paramsList=paramsList)	
 	#shows a collection on the click of the show collection button in the collections page	
 	@cherrypy.expose	
 	def showCollection(self, collectionToShowId):
-		conn = dataManager.startDbConnection(self.dbName)	
-		cursor = conn.cursor()
-
-		collectionsObject = collections.Collection(collectionToShowId,cursor)	
+		collectionsObject = collections.Collection(collectionToShowId,self.cursor)	
 		groupOfParameters = collectionsObject.groupOfParameters
 		collectionDictionary = collectionsObject.showACollection()
 		collectionName = collectionsObject.collectionName
-
-		conn.close()
 
 		template = env.get_template('displayCollection.html')
 		return template.render(groupOfParameters=groupOfParameters, collectionDictionary=collectionDictionary, collectionName=collectionName)	
@@ -174,8 +164,8 @@ class ServerConnection(object):
 	@cherrypy.expose	
 	def visualiseCollections(self, twoCollectionId, dbName):
 			conn = dataManager.startDbConnection(dbName)	
-			cursor = conn.cursor()	
-			html = testScatterText.visualiseCollections(cursor,twoCollectionId)
+			self.cursor = conn.cursor()	
+			html = testScatterText.visualiseCollections(self.cursor,twoCollectionId)
 			conn.close()
 			return html		
 
@@ -208,6 +198,7 @@ class ServerConnection(object):
 	def generateClusters(self,keyword):		
 		cluster = donutVis.Cluster(self.tweetDictionary)
 		clusteredTweetsDicts = cluster.clusterKeywords(self.keywordsForSegmentsList, keyword)
+
 		tweetsOfClustersStr = cluster.tweetsString
 		tweetsOfClustersList = cluster.filteredTweetsList
 		
@@ -216,36 +207,41 @@ class ServerConnection(object):
 	#searches for tweets for the selected cluster and segment keywords
 	#loads clusters stats page	
 	@cherrypy.expose	
-	def createClusters(self, keywordsToCluster, keywordsForSegments, enrichKeywords):	
+	def createClusters(self, keywordsToCluster, keywordsForSegments, enrichKeywords, task):	
 		keywordClusterList = resultsFiltering.createKeywordList(keywordsToCluster,',')	
-
-		if enrichKeywords == 'enrich':		
-			keywordsToClusterEnriched = word2vec.getSimilarForListOfWords(keywordClusterList)
-		else:
-			keywordsToClusterEnriched=keywordClusterList	
-
 		self.keywordsForSegmentsList = resultsFiltering.createKeywordList(keywordsForSegments,';')
-		if self.group == 'no groups':
-			searchResult = keywordSearch.SearchResult(keywordsToClusterEnriched, self.fromDate, self.toDate, self.dbName, self.location, self.searchQuery)
-			self.tweetDictionary = searchResult.retrieveTweets()
-			keywordConstraints = 'none'
+		if task=="dataset":
+			if enrichKeywords == 'enrich':		
+				keywordsToClusterEnriched = word2vec.getSimilarForListOfWords(keywordClusterList)
+			else:
+				keywordsToClusterEnriched=keywordClusterList		
+			if self.group == 'no groups':
+				searchResult = keywordSearch.SearchResult(keywordsToClusterEnriched, self.fromDate, self.toDate, self.dbName, self.location, self.searchQuery)
+				self.tweetDictionary = searchResult.retrieveTweets()
+				keywordConstraints = 'none'
+			else:
+				searchResult = keywordSearch.SearchResult(self.group, self.fromDate, self.toDate, self.dbName, self.location, self.searchQuery)
+				self.tweetDictionary = searchResult.filterTweets(keywordsToClusterEnriched)
+				keywordConstraints = resultsFiltering.getKeywordContraintString(self.group)
+			listOfResultParameters = [self.fromDate, self.toDate,self.location, self.searchQuery, keywordConstraints]	
 		else:
-			searchResult = keywordSearch.SearchResult(self.group, self.fromDate, self.toDate, self.dbName, self.location, self.searchQuery)
-			self.tweetDictionary = searchResult.filterTweets(keywordsToClusterEnriched)
-			keywordConstraints = resultsFiltering.getKeywordContraintString(self.group)	
-
+			keywordsToClusterEnriched=resultsFiltering.makeToList(keywordClusterList)
+			collectionsObject = collections.Collection(self.collectionId,self.cursor)
+			tweetCollectionDictionary = collectionsObject.showACollection()
+			self.tweetDictionary = resultsFiltering.filterTweets(tweetCollectionDictionary,keywordsToClusterEnriched)
+			listOfResultParameters = ["none", "none", "none", "none", "none"]	
+						
 		cluster = donutVis.Cluster(self.tweetDictionary)
-		listOfCounts = cluster.getCounts(self.keywordsForSegmentsList)
-		listOfResultParameters = [self.fromDate, self.toDate,self.location, self.searchQuery, keywordConstraints]
+		listOfCounts = cluster.getCounts(self.keywordsForSegmentsList)	
 		keywordsWithNoResults = cluster.getKeywordsWithNoResults(keywordsToClusterEnriched, listOfCounts)
+
 		if len(keywordsWithNoResults)==0:
 			check = 0
 		else:
 			check = 1
 
 		template = env.get_template('clustersStatsPage.html')
-		return template.render(countsList = listOfCounts,listOfResultParameters=listOfResultParameters,keywordsWithNoResults=keywordsWithNoResults,check=check)	
-
+		return template.render(countsList = listOfCounts,listOfResultParameters=listOfResultParameters,keywordsWithNoResults=keywordsWithNoResults,check=check)		
 	
 
 if __name__ == '__main__':

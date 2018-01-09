@@ -23,7 +23,7 @@ def getListOfCollection(database, listOfCollectionsWithDb):
     for collection in collectionsData:
         databaseCollectionName = database+"_collection"
         clusterRadioDbName = database+"_collection_forCluster"
-        newCollectionDataList = [collection[0], collection[1], collection[2], collection[3], collection[4], collection[5], databaseCollectionName,clusterRadioDbName]
+        newCollectionDataList = [collection[0], collection[1], collection[2], collection[3], collection[4], collection[5], databaseCollectionName,clusterRadioDbName,collection[6]]
         listOfCollectionsWithDb.append(newCollectionDataList)
     conn.close()
 
@@ -50,14 +50,17 @@ def searchForCollection(cursor, collectionId):
 def updateExistingCollection(cursor, collectionId, collectionName, collectionDescription,dateOfCreation):	
 	sqlQueries.updateCollectionEntry(cursor, collectionId, collectionName, collectionDescription,dateOfCreation)  
 
-def createNewCollection(cursor, collectionId, collectionName, collectionDescription,dateOfCreation):
-	sqlQueries.createANewCollectionEntry(cursor, collectionId, collectionName, collectionDescription,dateOfCreation)	
+def createNewCollection(cursor, collectionId, collectionName, collectionDescription,dateOfCreation, tweetCount):
+	sqlQueries.createANewCollectionEntry(cursor, collectionId, collectionName, collectionDescription,dateOfCreation, tweetCount)	
 
-def saveCollectionParameters(cursor, idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate):
-	sqlQueries.saveQueryParameters(cursor, idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate)
+def saveCollectionParameters(cursor, idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetCount):
+	sqlQueries.saveQueryParameters(cursor, idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetCount)
 
 def deleteASpecificParameter(cursor, idOfCollection, group):
-	sqlQueries.deleteASpecificParameter(cursor, idOfCollection, group)		
+	if group != '0':
+		sqlQueries.deleteASpecificParameter(cursor, idOfCollection, group)
+	else:
+		print('No paramters to delete selected.')			
 
 def deleteAllParametersOfACollection(cursor, idOfCollection):
 	sqlQueries.deleteAllParametersOfACollection(cursor, idOfCollection)
@@ -74,3 +77,16 @@ def getAllCollectionParameters(cursor):
 	listOfAllParameters = sqlQueries.getAllCollectionParameters(cursor)	
 
 	return listOfAllParameters
+
+def setTotalTweetCountOfACollection(cursor, tweetCount, collectionID):
+	sqlQueries.setTotalTweetCountOfACollection(cursor, tweetCount, collectionID)	
+
+def getParameterTweetCount(cursor, uniqueIdentifier, keywordGroup):
+	if keywordGroup!= '0':
+		countOfTweets = sqlQueries.getParameterTweetCount(cursor, uniqueIdentifier, keywordGroup)
+	else:
+		countOfTweets = '0'	
+	return countOfTweets	
+
+def decreaseTotalTweetCountOfACollection(cursor, tweetCount, collectionID):
+	sqlQueries.decreaseTotalTweetCountOfACollection(cursor, tweetCount, collectionID)	

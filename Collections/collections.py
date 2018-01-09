@@ -1,9 +1,8 @@
-import databaseConfigurations.sqlQueries as sqlQueries
 import DataManager.collectionsDataManager as collectionsDataManager
 import DataManager.tweetsDataManager as tweetsDataManager
 import processingData.resultsFiltering as resultsFiltering
-import processingData.fileFunctions as fileFunctions
-import Analysis.testScatterText as testScatterText
+import DataManager.dataManager as dataManager
+
 #class that contains the methods for collections
 class Collection():
 	def __init__(self, collectionId, cursor):
@@ -14,27 +13,29 @@ class Collection():
 		self.collectionName = collectionsDataManager.getCollectionName(cursor, str(self.collectionId))
 	#function checks if a collection already exists, if it does, it updates it, if not it creates a new collection entry
 	#also saves the new parameters to the parameters table	
-	def saveCollection(self, collectionName, collectionDescription, dateOfCreation, groupOfKeywords, searchQuery, location, fromDate, toDate):
+	def saveCollection(self, collectionName, collectionDescription, dateOfCreation, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetsCount):
 		checkIfExists = collectionsDataManager.searchForCollection(self.cursor,self.collectionId)
 		if len(checkIfExists)>0:
 			collectionsDataManager.updateExistingCollection(self.cursor, self.collectionId, collectionName, collectionDescription,dateOfCreation)
+			collectionsDataManager.setTotalTweetCountOfACollection(self.cursor, tweetsCount, self.collectionId)
 		else:
-			collectionsDataManager.createNewCollection(self.cursor, self.collectionId, collectionName, collectionDescription,dateOfCreation)	
+			collectionsDataManager.createNewCollection(self.cursor, self.collectionId, collectionName, collectionDescription,dateOfCreation, tweetsCount)	
 
 		self.idOfCollection = collectionsDataManager.getCollectionId(self.cursor,self.collectionId)
-		collectionsDataManager.saveCollectionParameters(self.cursor, self.idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate)	
+		collectionsDataManager.saveCollectionParameters(self.cursor, self.idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetsCount)	
 	#updates a collection, triggered by the update modal on the collections page
 	#if specified any, removes parameters for the given collection	
-	def updateCollection(self, collectionId, timeStamp, nameOfProject, descriptionOfProject,keywordGroups):
-			if len(keywordGroups)>0:
-				if isinstance(keywordGroups, str):
-					listOfKeywordGroups = [keywordGroups]
-				else:
-					listOfKeywordGroups=keywordGroups	
+	def updateCollection(self, collectionId, timeStamp, nameOfProject, descriptionOfProject,keywordGroups):		
+			if isinstance(keywordGroups, str):
+				listOfKeywordGroups = [keywordGroups]
+			else:
+				listOfKeywordGroups=keywordGroups	
 			
-				for group in listOfKeywordGroups:
-					print(str(group))
-					collectionsDataManager.deleteASpecificParameter(self.cursor, str(self.idOfCollection), group)
+			for group in listOfKeywordGroups:
+				print(str(group))
+				countOfTweets = collectionsDataManager.getParameterTweetCount(self.cursor, str(self.idOfCollection), group)
+				collectionsDataManager.decreaseTotalTweetCountOfACollection(self.cursor, countOfTweets, self.collectionId)
+				collectionsDataManager.deleteASpecificParameter(self.cursor, str(self.idOfCollection), group)
 
 			collectionsDataManager.updateExistingCollection(self.cursor, self.collectionId, nameOfProject, descriptionOfProject,timeStamp)
 	#deletes a collection from the collections table and its parameters from the parametersForCollections table		
@@ -43,7 +44,7 @@ class Collection():
 		collectionsDataManager.deleteCollectionEntry(self.cursor, self.collectionId)	
 	#fetches the tweets related to that collection from the database and displays them	
 	def showACollection(self):
-		listOfCollectionParameters = collectionsDataManager.getParametersOfCollection(self.cursor, str(self.idOfCollection))
+		listOfCollectionParameters = self.getAllCollectionParamters()
 		tweets=[]
 		i=0
 		for parameter in listOfCollectionParameters:
@@ -77,8 +78,27 @@ class Collection():
 		paramsList = resultsFiltering.makeAStringOfKeywordGroups(parametersDictionary)
 		print(paramsList)
 
-		return paramsList	
+		return paramsList
 
+	def getAllCollectionParamters(self):		
+		listOfCollectionParameters = collectionsDataManager.getParametersOfCollection(self.cursor, str(self.idOfCollection))
+
+		return listOfCollectionParameters
+
+	def getAllCollectionParametersKeywords(self):
+		listOfCollectionParameters = self.getAllCollectionParamters()
+
+		collectionKeywordStr = ""
+		i=0
+		for parameter in listOfCollectionParameters:
+			if i==0 or i==len(listOfCollectionParameters):
+				collectionKeywordStr += parameter[1]
+			else:
+				collectionKeywordStr = collectionKeywordStr + " OR " + parameter[1]
+
+			i+=1	
+
+		return collectionKeywordStr			
 				
 
 		

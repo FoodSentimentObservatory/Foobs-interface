@@ -57,7 +57,7 @@
 							            <div id="{{key}}" class="setVisibility">
 							            	{% for v in values %}
 							                <div class="funkyradio-success">
-											    <input type="radio" name="searchnoteID" id="{{v[3]}}" value="{{v[0]}}" onclick="displaySearchData('{{v[0]}}','{{v[5]}}','{{v[6]}}','{{v[7]}}', '{{v[8]}}', '{{v[9]}}','{{v[10]}}','{{v[11]}}','{{v[12]}}'); setLocalStorage('{{v[7]}}')"/>
+											    <input type="radio" name="searchnoteID" id="{{v[3]}}" value="{{v[0]}}" onclick="displaySearchData('{{v[0]}}','{{v[5]}}','{{v[6]}}','{{v[7]}}', '{{v[8]}}', '{{v[9]}}','{{v[10]}}','{{v[11]}}','{{v[12]}}'); setLocalStorage('{{v[7]}}');changeFormAction('filterKeywords')"/>
 											    <input type="hidden" name="keywords" value="{{v[7]}}">
 											    <label for="{{v[3]}}">{{v[0]}}</label>
 											</div>
@@ -81,9 +81,9 @@
 							            <div id="{{key}}" class="setVisibility">
 							            	{% for v in values %}
 							                <div class="funkyradio-success">
-								                <input type="checkbox" name="collectionRow" class="checkthis" id="{{v[2]}}" value="{{v[2]}}"/>
+								                <input type="checkbox" name="collectionRow" class="checkthis" id="{{v[2]}}" value="{{v[2]}}" onclick="changeFormAction('selectCollection')" />
 								                
-												    <label for="{{v[2]}}">{{v[3]}}</label>
+												    <label for="{{v[2]}}">{{v[3]}} : {{v[8]}} tweets</label>
 							                </div>
 							                {% endfor %}
 								 		</div>
@@ -94,7 +94,7 @@
 				    </div>
  					<div class="panel">
  						<div class="panel-heading">
- 							<h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#clusteringOptions">Cluster</a></h4>
+ 							<h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#clusteringOptions" onclick="closeAccordions()">Cluster</a></h4>
  						</div>
  						<div class="collapse" id="clusteringOptions">
  							<div class="panel-body">
@@ -110,8 +110,8 @@
 									            <div id="{{values[0][7]}}" class="setVisibility">
 									            	{% for v in values %}
 										                <div class="funkyradio-success">
-											                <input type="radio" name="collectionId" id="{{v[0]}}" value="{{v[2]}}"/>
-															   <label for="{{v[0]}}">{{v[3]}}</label>
+											                <input type="radio" name="collectionId" id="{{v[0]}}" value="{{v[2]}}" onclick="changeFormAction('clusterACollection')" />
+															   <label for="{{v[0]}}">{{v[3]}} : {{v[8]}} tweets</label>
 										                </div>
 							                		{% endfor %}
 										 		</div>
@@ -128,7 +128,7 @@
 									            <div id="{{values[0][15]}}" class="setVisibility">
 									            	{% for v in values %}
 									                <div class="funkyradio-success">
-													    <input type="radio" name="searchnoteIDForCluster" id="{{v[14]}}" value="{{v[0]}}" onclick="displaySearchData('{{v[0]}}','{{v[5]}}','{{v[6]}}','{{v[7]}}', '{{v[8]}}', '{{v[9]}}','{{v[10]}}','{{v[11]}}','{{v[12]}}'); setLocalStorage('{{v[7]}}');setKeywordsCluster('{{v[7]}}')"; />
+													    <input type="radio" name="searchnoteIDForCluster" id="{{v[14]}}" value="{{v[0]}}" onclick="displaySearchData('{{v[0]}}','{{v[5]}}','{{v[6]}}','{{v[7]}}', '{{v[8]}}', '{{v[9]}}','{{v[10]}}','{{v[11]}}','{{v[12]}}'); setLocalStorage('{{v[7]}}');setKeywordsCluster('{{v[7]}}');changeFormAction('clusterDataset')" />
 													    
 													    <label for="{{v[14]}}">{{v[0]}}</label>
 													</div>

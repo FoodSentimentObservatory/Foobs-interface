@@ -4,7 +4,7 @@
 	<head>
    {% include "parts/headContent.html" %}
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
+    <title>FoObs Clusters Result Stats</title>
 	</head>
 
 	<body onload="checkForNoResultKeywords('{{check}}');">
@@ -37,7 +37,7 @@
           <tbody>
           {% for cluster in countsList %}
             <tr>
-                <td>{{cluster[0]}}</td>
+                <td>{{cluster[2]}}</td>
                 <td>{{cluster[1]}}</td>
                 <td>
                   <form action="/generateClusters">

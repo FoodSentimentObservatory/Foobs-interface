@@ -135,7 +135,6 @@ def findWordInText(word, alreadySeenWords, text):
     count = 0
     regex = r'\b'+word.strip()+'\\b'
     listL=re.findall(regex,text.lower())
- 
     if  len(listL)>0 and str(word) not in alreadySeenWords:
         alreadySeenWords.append(word)
         count=1 
@@ -178,7 +177,6 @@ def addNewKeywordGroups(group, keywordsToCluster):
             newKeywordGroup = [keyword]
             for w in word:
                 newKeywordGroup.append(w)
-            print(newKeywordGroup)
             newKeywordGroupList.append(newKeywordGroup)
 
     return newKeywordGroupList    
@@ -204,7 +202,14 @@ def getTwitterLink(tweetId,userHandle):
 #as different strings can be split by different characters
 def createKeywordList(keywords, splitChar):
     if isinstance(keywords, str):
-        keywordList = keywords.split(splitChar)
+        if " OR " in keywords:
+            keywordList = []
+            groupList = keywords.split(" OR ")
+            for group in groupList:
+                keywordGroup = group.split(splitChar)
+                keywordList.append(keywordGroup)
+        else:     
+            keywordList = keywords.split(splitChar)
     else:
         keywordList=keywords 
 
@@ -223,4 +228,33 @@ def addClickableLinks(tweets):
             #sending the tweets to a list
             tweetList.append(tweetL)
 
-    return tweetList             
+    return tweetList 
+#function to filter tweets for donut display, currently used when 
+#collection option has been selected for donut vis
+def filterTweets(tweetsDictionary, keywordsToClusterEnriched):
+        newListOfTweets = [] 
+        for key, value in tweetsDictionary.items():
+            for tweet in value:
+                for wordList in keywordsToClusterEnriched:
+                        count = findKeywordsInText(tweet[0],wordList)
+                        if count==len(wordList):
+                            wordStr=','.join(wordList)
+                            wordKeyStr = ''.join(wordList)
+                            newTweetList = [tweet[0],tweet[1],tweet[2],tweet[3],tweet[4],tweet[5], wordStr, tweet[7],tweet[8],wordKeyStr]
+                            newListOfTweets.append(newTweetList)                
+        index = 9
+        newTweetsDictionary = dictionaryGen(newListOfTweets,index)
+
+        return  newTweetsDictionary                
+
+def makeToList(keywordClusterList):
+    newKeywordList = []
+    for group in keywordClusterList:
+        if "+" in group:
+            groupList = group.split("+")
+        else:
+            groupList = [group] 
+
+        newKeywordList.append(groupList)  
+
+    return newKeywordList                     

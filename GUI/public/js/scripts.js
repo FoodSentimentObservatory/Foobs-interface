@@ -65,6 +65,8 @@ function postKeywords(){
 		return false;
 	}				
 };
+//creates the div that will contain the keyword groups from KeywordSearch page
+//and clusterSpecForm
 function createAContainerForKeywords(){
 	var div = document.createElement("div");
 		div.style.width = "100%";					
@@ -84,6 +86,7 @@ $('#keywordGroupShow').on('click', '.close', function(events){
 	$(this).parents('div').eq(1).remove();
 	document.getElementById("check").value="no groups";
 });
+
 function countCheckboxes(checkboxValueList){
 	var count = 0;
 	var vals ="";
@@ -100,7 +103,7 @@ function countCheckboxes(checkboxValueList){
 	var checkBoxstuff = [count, vals];		
 	return checkBoxstuff;		 
 }	
-		//checks if every section of the homepage form has a value	
+//checks if every section of the homepage form has a value	
 function validateForm()	{
 	var formAction = document.getElementById('searchSpecs').action;
 
@@ -115,7 +118,7 @@ function validateForm()	{
 	}else if(formAction.match(/^.*clusterFromDataSet$/)){
 			console.log('something')
 			return true;
-	}else if(formAction.match(/^.*clusterACollection$/)){
+	}else if(formAction.match(/^.*collectionClusterParams$/)){
 			var collection = document.forms["searchSpecs"]["collectionId"].value;
 			if (collection==""){
 				alertMessageDiv= "<div class='alert alert-danger' role='alert'><strong>Oh snap!</strong> \
@@ -375,6 +378,7 @@ function changeValues(){
 	document.getElementById('groupOfKeywords').value = keywordGroup;
 	console.log(document.getElementById('groupOfKeywords').value);	
 	document.getElementById('dbName').value= localStorage['dbName'];
+	document.getElementById('tweetsCount').value = document.getElementById('numberOfTweets').value;
 
 };
 
@@ -405,7 +409,7 @@ function setCollectionDateForEdit(name, description, collectionId, collectionDbI
 	var keywordGroups = keywords.split(";");
 	var checkboxInputs = ""
 	for (var i = 0; i < keywordGroups.length; i++) {
-		checkboxInputs += "<div class='checkbox checkbox-success checkbox-inline'><input type='checkbox' name='keywordGroups' id='"+keywordGroups[i]+"' \
+		checkboxInputs += "<div class='checkbox checkbox-success checkbox-inline'><input type='hidden' name='keywordGroups' value = '0'><input type='checkbox' name='keywordGroups' id='"+keywordGroups[i]+"' \
 		value = '"+keywordGroups[i]+"'/><label for='"+keywordGroups[i]+"'>"+keywordGroups[i]+"</label></div>"
 	}
 	var today = new Date();
@@ -505,6 +509,8 @@ function selectDataToBeShown(database,notDatabase){
 	}
 };
 //changes the form action in the index page depending on the functionality selected
+//disbles the input fields that are not needed for the selected functionality
+//closes the other accordions
 function changeFormAction(formAction){
 	if (formAction == 'filterKeywords'){
 		document.getElementById('searchSpecs').action="/connectToScript";
@@ -513,11 +519,14 @@ function changeFormAction(formAction){
 			$('input[name="start"]').prop('disabled', false);
 			$('input[name="twoCollectionId"]').prop('disabled', true);
 			$('input[name="collectionRow"]').prop('disabled', true);
+			$('input[name="collectionId"]').prop('disabled', true);
 			$('input[name="keywordsCluster"]').prop('disabled', true);
 			$('input[name="searchnoteIDForCluster"]').prop('disabled', true);
 			$('input[name="searchnoteID"]').prop('disabled', false);
 			$('input[name="task"]').prop('disabled', false);
-		document.getElementById('task').value='/keywordSearch';	
+		document.getElementById('task').value='/keywordSearch';
+		$("#selectCollection").collapse("hide");
+		$("#clusteringOptions").collapse("hide");	
 	}else if(formAction== 'selectCollection'){
 		document.getElementById('searchSpecs').action="/visualiseCollections";
 			$('input[name="keywords"]').prop('disabled', true);
@@ -528,31 +537,42 @@ function changeFormAction(formAction){
 			$('input[name="task"]').prop('disabled', true);
 			$('input[name="searchnoteIDForCluster"]').prop('disabled', true);
 			$('input[name="searchnoteID"]').prop('disabled', true);
-	}else if(formAction == 'clusterACollection'){
-		document.getElementById('searchSpecs').action="/clusterACollection";
-			$('input[name="keywords"]').prop('disabled', true);
-			$('input[name="endof"]').prop('disabled', true);
-			$('input[name="start"]').prop('disabled', true);
-			$('input[name="twoCollectionId"]').prop('disabled', true);
-			$('input[name="keywordsCluster"]').prop('disabled', true);
-			$('input[name="task"]').prop('disabled', true);
-			$('input[name="searchnoteIDForCluster"]').prop('disabled', true);
-			$('input[name="searchnoteID"]').prop('disabled', true);
-	}else{
-		document.getElementById('searchSpecs').action="/clusterFromDataSet";
-			$('input[name="keywords"]').prop('disabled', true);
-			$('input[name="endof"]').prop('disabled', false);
-			$('input[name="start"]').prop('disabled', false);
-			$('input[name="keywordsCluster"]').prop('disabled', false);
-			$('input[name="twoCollectionId"]').prop('disabled', true);
-			$('input[name="searchnoteIDForCluster"]').prop('disabled', false);
-			$('input[name="task"]').prop('disabled', false);
-			$('input[name="searchnoteID"]').prop('disabled', true);
-			$('input[name="collectionRow"]').prop('disabled', true);
-		document.getElementById('task').value='/specifyClusterParams';	
+			$('input[name="collectionRow"]').prop('disabled', false);
+			$("#filterKeywords").collapse("hide");
+			$("#clusteringOptions").collapse("hide");
+			$('input[name="collectionId"]').prop('disabled', true);		
+	}else {
+		$('input[name="keywords"]').prop('disabled', true);
+		$('input[name="twoCollectionId"]').prop('disabled', true);
+		$('input[name="searchnoteID"]').prop('disabled', true);
+		$('input[name="collectionRow"]').prop('disabled', true);
+		if(formAction == 'clusterACollection'){
+			document.getElementById('searchSpecs').action="/collectionClusterParams";	
+				$('input[name="endof"]').prop('disabled', true);
+				$('input[name="start"]').prop('disabled', true);
+				$('input[name="keywordsCluster"]').prop('disabled', true);
+				$('input[name="task"]').prop('disabled', true);
+				$('input[name="searchnoteIDForCluster"]').prop('disabled', true);
+				$("#selectedDataSource").collapse("hide");	
+				$('input[name="collectionId"]').prop('disabled', false);
+		}else{
+			document.getElementById('searchSpecs').action="/clusterFromDataSet";
+				$('input[name="endof"]').prop('disabled', false);
+				$('input[name="start"]').prop('disabled', false);
+				$('input[name="keywordsCluster"]').prop('disabled', false);
+				$('input[name="searchnoteIDForCluster"]').prop('disabled', false);
+				$('input[name="task"]').prop('disabled', false);	
+				$("#listCollections").collapse("hide");	
+				$('input[name="collectionId"]').prop('disabled', true);
+			document.getElementById('task').value='/specifyClusterParams';	
+		}
 	}
 	console.log(document.getElementById('searchSpecs').action);
 };
+function closeAccordions(){
+		$("#selectCollection").collapse("hide");
+		$("#filterKeywords").collapse("hide");
+}
 //for the filter keywords functionality
 function specifyTaskDataToBeShown(task){
 	if (task=='clusterDataset'){
@@ -731,14 +751,23 @@ $('#radioBtn a').on('click', function(){
     }
 
 });
-function showKeywordGroups(keywordGroup){
-	if (keywordGroup=='no groups'){
-		$('input[id="clusterFromKGroups"]').prop('disabled', true);
-		$('input[id="segmentFromKGroups"]').prop('disabled', true);
+function showKeywordGroups(keywordGroup, task){
+	if (task =='dataset'){
+		if (keywordGroup=='no groups'){
+			$('input[id="clusterFromKGroups"]').prop('disabled', true);
+			$('input[id="segmentFromKGroups"]').prop('disabled', true);
+		}else{
+			layout="<p>"+keywordGroup+"</p>";
+			document.getElementById('showkeywordGroup').innerHTML=layout;
+		}
 	}else{
+		$('input[id="clusterFromSearch"]').prop('disabled', true);
+		$('input[id="segmentFromSearch"]').prop('disabled', true);
+
 		layout="<p>"+keywordGroup+"</p>";
 		document.getElementById('showkeywordGroup').innerHTML=layout;
 	}
+	
 };
 function showAddKeywordButton(divId, buttonTitle,keywordInputName){
 	layout = "<div class='col-sm-10' id='keywordGroupShow'><div id='errorArea'></div></div><div id='keywordGroupModalDiv' class='keywordGroupModal col-xs-8'>\
@@ -812,12 +841,24 @@ function saveAndDisplayKeywords(){
 	}	
 };
 function setKeywordsToCluster(keywords){
-	document.getElementById('keywordsToCluster').value = keywords;
+	if (keywords.indexOf(" OR ")!= -1){
+		newStr = keywords.replace(/,/g,"+");
+		newKeywordStr = newStr.replace(/ OR /g, ",");
+	}else{
+		newKeywordStr = keywords;
+	}
+	console.log(keywords);
+	document.getElementById('keywordsToCluster').value = newKeywordStr;
 	console.log(document.getElementById('keywordsToCluster').value);
 	document.getElementById("errorClusterArea").innerHTML = "";
 };
 function setKeywordsForSegment(keywords){
-	document.getElementById('keywordsForSegments').value = keywords;
+	if (keywords.indexOf(",") != -1){
+		newKeywordStr = keywords.replace(/,/g, ";");
+	}else{
+		newKeywordStr = keywords
+	}
+	document.getElementById('keywordsForSegments').value = newKeywordStr;
 	console.log(document.getElementById('keywordsForSegments').value);
 	document.getElementById("errorSegmentArea").innerHTML = "";
 
@@ -873,4 +914,11 @@ function checkForNoResultKeywords(check){
 		message = "<div class='alert alert-info'>All selected keywords returned some results.</div>";
 		document.getElementById('keywordInfo').innerHTML=message;
 	}
-} 
+};
+function checkForResults(numberOfTweets,groupName){
+	if (numberOfTweets=='0'){
+		$("#error").html("No results were found for <strong>'"+groupName+"'</strong>.");
+      $('#noResultsAlert').modal("show");
+	}
+}
+
