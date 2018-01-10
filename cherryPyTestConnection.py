@@ -60,12 +60,13 @@ class ServerConnection(object):
 		self.cursor = self.conn.cursor()
 	#script for data explorer search, displays the result page
 	@cherrypy.expose	
-	def keywordSearch(self, group, checkName,fromDate,toDate, dbName,checkIfKeywords):
+	def keywordSearch(self, group, checkName,fromDate,toDate, dbName,checkIfKeywords,checkIfRetweets):
 		self.fromDate = fromDate
 		self.toDate = toDate
 		self.dbName = dbName
-		self.group = group		
-		searchResult = keywordSearch.SearchResult(self.group, self.fromDate, self.toDate, self.dbName, self.location, self.searchQuery)
+		self.group = group	
+		self.retweets = checkIfRetweets	
+		searchResult = keywordSearch.SearchResult(self.group, self.fromDate, self.toDate, self.dbName, self.location, self.searchQuery,self.retweets)
 		listOfCollections = searchResult.listOfCollections()
 		tweetDictionary = searchResult.retrieveTweets()
 		groupList = searchResult.getGroupList()
@@ -85,12 +86,12 @@ class ServerConnection(object):
 		return template.render(dicw=orderedFreqKeywordTweetDict, groupOriginalName=groupOriginalName, groupList=groupList, word=word)	
 	#loads the cluster form page	
 	@cherrypy.expose
-	def specifyClusterParams(self, fromDate,toDate,dbName,checkIfKeywords, group, checkName):
+	def specifyClusterParams(self, fromDate,toDate,dbName,checkIfKeywords, group, checkName,checkIfRetweets):
 		self.fromDate = fromDate
 		self.toDate = toDate
 		self.dbName = dbName
 		self.group = group
-		print(self.keywordsOfSearch)
+		self.retweets = checkIfRetweets
 		template = env.get_template('clusterSpecForm.html')
 		return template.render(keywords=self.keywordsOfSearch, keywordGroups = self.group, task="dataset")
 	@cherrypy.expose	
@@ -110,7 +111,7 @@ class ServerConnection(object):
 	@cherrypy.expose
 	def saveCollection(self,collectionId, collectionName, collectionDescription, dbName, dateOfCreation, groupOfKeywords,tweetsCount):
 		collectionsObject = collections.Collection(collectionId,self.cursor)
-		collectionsObject.saveCollection(collectionName, collectionDescription, dateOfCreation, groupOfKeywords, self.searchQuery, self.location, self.fromDate, self.toDate, tweetsCount)
+		collectionsObject.saveCollection(collectionName, collectionDescription, dateOfCreation, groupOfKeywords, self.searchQuery, self.location, self.fromDate, self.toDate, tweetsCount, self.retweets)
 
 		collectionsList = collectionsObject.getAllCollections()
 		paramsList = collectionsObject.getAllParameters()
@@ -207,7 +208,7 @@ class ServerConnection(object):
 	#searches for tweets for the selected cluster and segment keywords
 	#loads clusters stats page	
 	@cherrypy.expose	
-	def createClusters(self, keywordsToCluster, keywordsForSegments, enrichKeywords, task):	
+	def createClusters(self, keywordsToCluster, keywordsForSegments, enrichKeywords, task):
 		keywordClusterList = resultsFiltering.createKeywordList(keywordsToCluster,',')	
 		self.keywordsForSegmentsList = resultsFiltering.createKeywordList(keywordsForSegments,';')
 		if task=="dataset":
@@ -217,17 +218,12 @@ class ServerConnection(object):
 				keywordsToClusterEnriched=keywordClusterList	
 
 			if self.group == 'no groups':
-				searchResult = keywordSearch.SearchResult(keywordsToClusterEnriched, self.fromDate, self.toDate, self.dbName, self.location, self.searchQuery)
+				searchResult = keywordSearch.SearchResult(keywordsToClusterEnriched, self.fromDate, self.toDate, self.dbName, self.location, self.searchQuery,self.retweets)
 				self.tweetDictionary = searchResult.retrieveTweets()
 				keywordConstraints = 'none'
 			else:
-				searchResult = keywordSearch.SearchResult(self.group, self.fromDate, self.toDate, self.dbName, self.location, self.searchQuery)
-				self.tweetDictionary = searchResult.filterTweets(keywordsToClusterEnriched)
-				for key,values in self.tweetDictionary.items():
-					print(key)
-					for v in values:
-						print(v)
-					print("+++++++++++++++++++++++")	
+				searchResult = keywordSearch.SearchResult(self.group, self.fromDate, self.toDate, self.dbName, self.location, self.searchQuery,self.retweets)
+				self.tweetDictionary = searchResult.filterTweets(keywordsToClusterEnriched)	
 				keywordConstraints = resultsFiltering.getKeywordContraintString(self.group)
 			listOfResultParameters = [self.fromDate, self.toDate,self.location, self.searchQuery, keywordConstraints]	
 		else:
@@ -255,7 +251,8 @@ if __name__ == '__main__':
 	conf = {
 		'/': {
 			'tools.sessions.on': True,
-			'tools.staticdir.root': os.path.abspath(os.getcwd())
+			'tools.staticdir.root': os.path.abspath(os.getcwd()),
+			'response.timeout': 6000
 		},
 		'/static': {
 			'tools.staticdir.on': True,

@@ -160,9 +160,9 @@ def getCollectionName (cursor, uniqueId):
         
     return collectionNameStr  
 #saves query parameters to database
-def saveQueryParameters(cursor, collectionId, keywords, searchQuery, location, fromDate, toDate, tweetCount):
-    sql = "INSERT INTO [ParametersForCollections] ([keywords], [searchQuery], [location], [fromDate], [toDate], [collectionId], [countOfTweets]) VALUES (%s,%s,%s,%s,%s,%s,%d)"
-    cursor.execute(sql,(keywords,searchQuery,location,fromDate,toDate,collectionId, int(tweetCount)))
+def saveQueryParameters(cursor, collectionId, keywords, searchQuery, location, fromDate, toDate, tweetCount,retweets):
+    sql = "INSERT INTO [ParametersForCollections] ([keywords], [searchQuery], [location], [fromDate], [toDate], [collectionId], [countOfTweets], [retweets]) VALUES (%s,%s,%s,%s,%s,%s,%d,%s)"
+    cursor.execute(sql,(keywords,searchQuery,location,fromDate,toDate,collectionId, int(tweetCount),retweets))
     print("new keyword group created.")
 #retrieves all parameters for a given collection
 def getParametersOfCollection(cursor, collectionId):

@@ -50,7 +50,14 @@
 						</div>
 						<div class="col-sm-12" id="addOwnWordsClusters"></div>
 					</div>
-				</div>    
+					
+				</div> 
+				<div class="col-sm-12" id="fileInputOption">
+						<div id="orDiv"><h4>OR</h4></div>
+							<input type="file" name="clusterOption" id="fileOption" value="" accept=".txt" onchange='readText(this)'>
+							<h2><label for="fileOption"><span class="label label-warning">Upload keyword file</span></label></h2>
+							<input id="uploadFile" placeholder="Filename" disabled="disabled" />
+					</div>   
 			</div>
 
 			<div id="segments" class="col-sm-6">

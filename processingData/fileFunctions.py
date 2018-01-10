@@ -57,6 +57,12 @@ def writeJstFile(texts, origCount):
 
     print("JST data file created.")   
 
+def writeTxtFrequencyFile(listOfWords, fileNameString,counter):
+    path = config.getReportsPath()
+    with open('%s/%s.csv'%(path,fileNameString),'w',newline='', encoding = 'utf-8') as f:
+        writer = csv.writer(f, delimiter=',')
+        writer.writerows(tupleList)
+
 def readJSTResultFiles():
 	path = config.getJstFinalTwords()
 	charList = ["b'","\\n'"]

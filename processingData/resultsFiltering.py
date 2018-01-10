@@ -17,43 +17,31 @@ def textCleanup(allWords,text):
             if word.is_stop != True and word.like_url != True and word.is_punct !=True and word.like_num != True and words.isalpha()== True and len(words)> 1:
                 allWords.append(words.lower())          
 
-#removes duplicating tweets (based on platfrom ID) and retweets*
+#removes retweets*
 #* if we don't have the original tweet text, one retweet can get through the filtering..
 # ..the retweet is stripped from the 'rt' and any mentions and the remaining string is compared to a list of originals
-def removeDupsAndRetweets(row, location):
-    twitterIDs = []
-    origTexts = []
-    retweetTexts = []
-    rowS=[]
-    i = 0
-    sortedRow = sorted(row, key=itemgetter(3))
-    for r in sortedRow:
-        i = i+1
-        if r[4] not in twitterIDs:
-            twitterIDs.append(r[4])
-            text = r[2].lower()
-            textList = text.split()
-            textStrList = [word for word in textList if word.isalpha()]
-            textStrRt = ' '.join(textStrList)
-            textStr = replaceChars("rt", '', textStrRt)
-            textStrStripped = textStr.strip()
-            if textList[0]=="rt":
-                if textStrStripped in origTexts:
-                    retweetTexts.append(textStrStripped)
-                else:
-                    origTexts.append(textStrStripped)
-                    rowS.append(r)
+def removeDupsAndRetweets(text, origTexts,retweetTexts):
+    textList = text.split()
+    textStrList = [word for word in textList if word.isalpha()]
+    textStrRt = ' '.join(textStrList)
+    textStr = replaceChars("rt", '', textStrRt)
+    textStrStripped = textStr.strip()
 
-            elif textList[0]!="rt" and textStrStripped not in origTexts:
-                origTexts.append(textStrStripped)
-                rowS.append(r)
+    if textList[0]=="rt":
+        if textStrStripped in origTexts:
+            retweetTexts.append(textStrStripped)
+            include = False
+        else:
+            origTexts.append(textStrStripped)
+            include = True
 
-        if i%10000==0:
-            print("processed "+ str(i) +  " tweets")
+    elif textList[0]!="rt" and textStrStripped not in origTexts:
+        origTexts.append(textStrStripped)
+        include = True
+    else:
+        include = False    
 
-    print ("All tweets from "+location+" have been processed.")
-
-    return rowS
+    return include
 #make any links in the tweet bodies clickable
 def clickableLinks(item):
     r = re.compile(r"(https://[^ ]+)")

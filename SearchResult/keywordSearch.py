@@ -5,7 +5,7 @@ import Analysis.frequencyCount as frequencyCount
 import DataManager.collectionsDataManager as collectionsDataManager
 
 class SearchResult:		
-	def __init__(self, group,fromDate,toDate, dbName, location, searchQuery):
+	def __init__(self, group,fromDate,toDate, dbName, location, searchQuery, retweets):
 		self.dbName=dbName	
 		self.fromDate = fromDate
 		self.toDate = toDate
@@ -13,7 +13,7 @@ class SearchResult:
 		self.listOfGroups = self.listOfGroups()
 		self.location = location
 		self.searchQuery = searchQuery
-
+		self.retweets = retweets
 		self.conn = self.startDbConnection()
 		self.cursor = self.conn.cursor()
 
@@ -33,7 +33,7 @@ class SearchResult:
 #a dictionary to the controller
 	def retrieveTweets(self):			
 		#getting all tweets with the specified keywords, the result is a list of lists, tweets are grouped in lists by keyword groups
-		self.tweets=tweetsDataManager.fetchingTweetsContainingGroups(self.cursor,self.location,self.searchQuery,self.listOfGroups, self.fromDate, self.toDate)
+		self.tweets=tweetsDataManager.fetchingTweetsContainingGroups(self.cursor,self.location,self.searchQuery,self.listOfGroups, self.fromDate, self.toDate,self.retweets)
 		self.conn.close()
 		i=0
 		tweetList=resultsFiltering.addClickableLinks(self.tweets)
@@ -46,6 +46,7 @@ class SearchResult:
 		i=0
 		groupList = []
 		if self.listOfGroups[0] != 'all tweets':
+			
 			for groupOfTweets in self.tweets:
 				numberOfTweets = len(groupOfTweets)
 				strGroupOfTweets = ','.join(self.listOfGroups[i])

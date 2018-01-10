@@ -1,9 +1,9 @@
 <ul class='nav nav-tabs'>
       {% for group in groupList %}
           {% if group[2] == 0 %}
-            <li class='active'><a data-toggle='tab' href='#{{group[0]}}' role="tab" onclick="changeKeywords('{{group[1]}}'); checkForResults('{{group[3]}}','{{group[1]}}')">{{group[1]}}</a></li>
+            <li class='active'><a data-toggle='tab' href='#{{group[0]}}' role="tab" onclick="changeKeywords('{{group[1]}}'); checkForResults('{{group[3]}}','{{group[1]}}'); setLocalStorageForCount('{{group[3]}}')">{{group[1]}}</a></li>
           {% else %}
-            <li><a data-toggle='tab' href='#{{group[0]}}' role="tab" onclick="changeKeywords('{{group[1]}}'); checkForResults('{{group[3]}}','{{group[1]}}')">{{group[1]}}</a></li> 
+            <li><a data-toggle='tab' href='#{{group[0]}}' role="tab" onclick="changeKeywords('{{group[1]}}'); checkForResults('{{group[3]}}','{{group[1]}}'); setLocalStorageForCount('{{group[3]}}')">{{group[1]}}</a></li> 
           {% endif %}           
       {% endfor %}     
 </ul> 

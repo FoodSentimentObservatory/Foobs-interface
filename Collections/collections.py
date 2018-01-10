@@ -13,8 +13,9 @@ class Collection():
 		self.collectionName = collectionsDataManager.getCollectionName(cursor, str(self.collectionId))
 	#function checks if a collection already exists, if it does, it updates it, if not it creates a new collection entry
 	#also saves the new parameters to the parameters table	
-	def saveCollection(self, collectionName, collectionDescription, dateOfCreation, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetsCount):
+	def saveCollection(self, collectionName, collectionDescription, dateOfCreation, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetsCount, retweets):
 		checkIfExists = collectionsDataManager.searchForCollection(self.cursor,self.collectionId)
+		print(tweetsCount)
 		if len(checkIfExists)>0:
 			#if collection exists, update entries in database and add the parameter tweet count to the total count of the collection
 			collectionsDataManager.updateExistingCollection(self.cursor, self.collectionId, collectionName, collectionDescription,dateOfCreation)
@@ -25,7 +26,7 @@ class Collection():
 
 		self.idOfCollection = collectionsDataManager.getCollectionId(self.cursor,self.collectionId)
 		#save the collection parameter entry in the database
-		collectionsDataManager.saveCollectionParameters(self.cursor, self.idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetsCount)
+		collectionsDataManager.saveCollectionParameters(self.cursor, self.idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetsCount,retweets)
 
 	#updates a collection, triggered by the update modal on the collections page
 	#if specified any, removes parameters for the given collection	
@@ -55,10 +56,14 @@ class Collection():
 			listOfKeywords = parameter[1].split(',')
 			listOfListOfKeywords = []
 			listOfListOfKeywords.append(listOfKeywords)
-			tweetsFromGroup=tweetsDataManager.fetchingTweetsContainingGroups(self.cursor,parameter[3],parameter[2],listOfListOfKeywords, parameter[4], parameter[5])
+			tweetsFromGroup=tweetsDataManager.fetchingTweetsContainingGroups(self.cursor,parameter[3],parameter[2],listOfListOfKeywords, parameter[4], parameter[5], parameter[9])
 			numberOfTweets = len(tweetsFromGroup[0])
 			noCommaGroupOfTweets = parameter[1].replace(",","")
-			parameterData = [noCommaGroupOfTweets, parameter[1],i ,parameter[2], parameter[3], parameter[4], parameter[5], numberOfTweets]
+			if parameter[9].strip() == "Y":
+				retweets = "yes"
+			else:
+				retweets = "no"	 
+			parameterData = [noCommaGroupOfTweets, parameter[1],i ,parameter[2], parameter[3], parameter[4], parameter[5], numberOfTweets,retweets]
 			self.groupOfParameters.append(parameterData)	
 			tweets.append(tweetsFromGroup)	
 			i+=1		

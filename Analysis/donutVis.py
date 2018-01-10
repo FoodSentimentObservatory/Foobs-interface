@@ -12,8 +12,6 @@ class Cluster:
 		self.tweetsString = ""
 #function that creates the string lists that will be used to display the donut
 	def clusterKeywords(self,newKeywordGroup, keyword):
-		print(newKeywordGroup)
-		print(keyword)
 		listOfDicts = []
 		for key, value in self.tweetDictionary.items():
 			#only matches to the key that is the same as the selected word
@@ -54,8 +52,7 @@ class Cluster:
 							keyStr = key.replace(",", " AND ")	
 						else:
 							keyStr = key		
-						wordTup = wordStr+"|"+keyStr+"|"+str(count)
-						print(wordTup)		
+						wordTup = wordStr+"|"+keyStr+"|"+str(count)	
 						filteredGroupOfTweets.append(wordTup)
 				index = 1	
 				strFilteredGroupOftweets = ','.join(filteredGroupOfTweets)
@@ -75,10 +72,8 @@ class Cluster:
 	def getCounts(self,keywordsForSegmentsList):	
 		listOfCounts=[]
 		for key, value in self.tweetDictionary.items():
-			print(key)
 			countOftweets=0
 			for word in keywordsForSegmentsList:
-				print(word)
 				for v in value:
 					alreadySeenWords=[]
 					if isinstance(word, str):
@@ -92,8 +87,7 @@ class Cluster:
 			if countOftweets>0:		
 				countTup = (key, countOftweets, v[6])
 				listOfCounts.append(countTup)
-				print(countTup)
-			print("---------------")	
+	
 		#ordering the final count list by count of tweets
 		orderedListOfCounts = sorted(listOfCounts, key=itemgetter(1), reverse=True)
 

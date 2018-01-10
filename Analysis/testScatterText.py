@@ -27,7 +27,7 @@ def visualiseCollections(cursor, twoCollectionId):
 			listOfKeywords = parameter[1].split(',')
 			listOfListOfKeywords = []
 			listOfListOfKeywords.append(listOfKeywords)
-			tweetsFromGroup=tweetsDataManager.fetchingTweetsContainingGroups(cursor,parameter[3],parameter[2],listOfListOfKeywords, parameter[4], parameter[5])	
+			tweetsFromGroup=tweetsDataManager.fetchingTweetsContainingGroups(cursor,parameter[3],parameter[2],listOfListOfKeywords, parameter[4], parameter[5], parameter[9])	
 			tweets.append(tweetsFromGroup)		
 
 		tweetList = [tweet for sublist in tweets for tweet in sublist]

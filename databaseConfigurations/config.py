@@ -31,3 +31,7 @@ def getJstTrainingProperties():
 def getJstFinalTwords():
 	finalTwordsPath = parser.get('jst-data','jstFinalTwords')	    
 	return finalTwordsPath
+
+def getReportsPath():
+	path = parser.get('reports', 'path')
+	return path	

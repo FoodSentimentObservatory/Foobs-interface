@@ -12,3 +12,6 @@ dataFile =
 trainingPropertiesFile = 
 jstExe=
 jstFinalTwords=
+
+[reports]
+path =

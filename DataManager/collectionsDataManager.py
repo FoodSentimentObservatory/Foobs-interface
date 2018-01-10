@@ -53,8 +53,8 @@ def updateExistingCollection(cursor, collectionId, collectionName, collectionDes
 def createNewCollection(cursor, collectionId, collectionName, collectionDescription,dateOfCreation, tweetCount):
 	sqlQueries.createANewCollectionEntry(cursor, collectionId, collectionName, collectionDescription,dateOfCreation, tweetCount)	
 
-def saveCollectionParameters(cursor, idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetCount):
-	sqlQueries.saveQueryParameters(cursor, idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetCount)
+def saveCollectionParameters(cursor, idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetCount,retweets):
+	sqlQueries.saveQueryParameters(cursor, idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetCount,retweets)
 
 def deleteASpecificParameter(cursor, idOfCollection, group):
 	if group != '0':

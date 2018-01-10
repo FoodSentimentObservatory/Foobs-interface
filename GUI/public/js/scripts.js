@@ -378,7 +378,7 @@ function changeValues(){
 	document.getElementById('groupOfKeywords').value = keywordGroup;
 	console.log(document.getElementById('groupOfKeywords').value);	
 	document.getElementById('dbName').value= localStorage['dbName'];
-	document.getElementById('tweetsCount').value = document.getElementById('numberOfTweets').value;
+	document.getElementById('tweetsCount').value = localStorage['countOfTweets'];
 
 };
 
@@ -745,12 +745,13 @@ $('#radioBtn a').on('click', function(){
     if(document.getElementById('checkIfKeywords').value=="Y"){
     	showAddKeywordButton('eitherOrContent','Add a keyword group');
     	document.getElementById("check").value="display error";
-    }else{
+    }else if (document.getElementById('checkIfKeywords').value=="N"){
     	hiddenInputs = "<input type='hidden' name='groups' value='no groups'/><input type='hidden' name='group' value='no groups'/>"
     	document.getElementById('eitherOrContent').innerHTML=hiddenInputs;
     }
 
 });
+
 function showKeywordGroups(keywordGroup, task){
 	if (task =='dataset'){
 		if (keywordGroup=='no groups'){
@@ -886,7 +887,7 @@ function hideOtherContent(selectedContent){
 	}
 }; 
 function validateClusterForm(){
-
+	var enrichedCheckbox = document.getElementsByName('keywordEnrichments');
 	if (document.forms["clusterForm"]["keywordsToCluster"].value==""){
 		alertMessageDiv= "<div class='alert alert-danger' role='alert'><strong>Whops</strong> \
 		You forgot to specify keywords for clusters.</div>";
@@ -897,17 +898,20 @@ function validateClusterForm(){
 		You forgot to specify keywords for cluster segments.</div>";
 		document.getElementById("errorSegmentArea").innerHTML = alertMessageDiv;
 		return false;
+	}else if (enrichedCheckbox.length>0){
+			console.log(enrichedCheckbox);	
+			if (enrichedCheckbox[0].checked){
+				document.getElementById('enrichKeywords').value='enrich';
+			}else{
+				document.getElementById('enrichKeywords').value='do not';
+			}
+			$(".se-pre-con").show();
+        $("#mainContainer").hide();
 	}else{
-		var enrichedCheckbox = document.getElementsByName('keywordEnrichments');
-		if (enrichedCheckbox[0].checked){
-			document.getElementById('enrichKeywords').value='enrich';
-		}else{
-			document.getElementById('enrichKeywords').value='do not';
-		}
 		$(".se-pre-con").show();
         $("#mainContainer").hide();
 		return true;
-	}
+	}		
 };
 function checkForNoResultKeywords(check){
 	if (check=='0'){
@@ -920,5 +924,22 @@ function checkForResults(numberOfTweets,groupName){
 		$("#error").html("No results were found for <strong>'"+groupName+"'</strong>.");
       $('#noResultsAlert').modal("show");
 	}
+}
+function readText(that){
+	var reader = new FileReader();
+	if(that.files && that.files[0]){
+				var reader = new FileReader();
+				reader.onload = function (e) {  
+					var output=e.target.result;
+					document.getElementById('keywordsToCluster').value = output;
+					console.log(output);
+				};
+				reader.readAsText(that.files[0]);
+			}
+	var linkList = that.value.split("\\");		
+	document.getElementById("uploadFile").value = linkList[2];		
+};
+function setLocalStorageForCount(countOfTweets){
+	localStorage.setItem( 'countOfTweets', countOfTweets );
 }
 
