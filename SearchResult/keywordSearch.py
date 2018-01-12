@@ -45,14 +45,13 @@ class SearchResult:
 	def getGroupList(self):
 		i=0
 		groupList = []
-		if self.listOfGroups[0] != 'all tweets':
-			
+		if self.listOfGroups[0] != 'all tweets':			
 			for groupOfTweets in self.tweets:
 				numberOfTweets = len(groupOfTweets)
 				strGroupOfTweets = ','.join(self.listOfGroups[i])
 				frequentWords = frequencyCount.frequencyCount(groupOfTweets,self.listOfGroups[i])
-				
-				noCommaGroupOfTweets = strGroupOfTweets.replace(',','')
+				charList = [",", " "]
+				noCommaGroupOfTweets = resultsFiltering.extraCharRemoval(strGroupOfTweets, charList,2)
 				groupTup = (noCommaGroupOfTweets, strGroupOfTweets,i,numberOfTweets,frequentWords, groupOfTweets)
 				groupList.append(groupTup)
 				i+=1
@@ -70,7 +69,8 @@ class SearchResult:
 		if self.listOfGroups[0] != 'all tweets':
 			for group in self.listOfGroups:
 				keywordString = ','.join(group)
-				noCommaKeywordGroup = ''.join(group)
+				charList = [",", " "]
+				noCommaKeywordGroup = resultsFiltering.extraCharRemoval(keywordString, charList,2)
 				groupTup = (noCommaKeywordGroup,keywordString,self.searchQuery, self.location, self.fromDate, self.toDate)
 				queryDataList.append(groupTup)
 		else:

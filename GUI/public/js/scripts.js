@@ -924,15 +924,17 @@ function checkForResults(numberOfTweets,groupName){
 		$("#error").html("No results were found for <strong>'"+groupName+"'</strong>.");
       $('#noResultsAlert').modal("show");
 	}
-}
+};
+//function to upload keyword file 
 function readText(that){
 	var reader = new FileReader();
 	if(that.files && that.files[0]){
 				var reader = new FileReader();
 				reader.onload = function (e) {  
 					var output=e.target.result;
-					document.getElementById('keywordsToCluster').value = output;
-					console.log(output);
+					var newStr = output.replace(/\n/g,",");
+					document.getElementById('keywordsToCluster').value = newStr;
+					console.log(newStr);
 				};
 				reader.readAsText(that.files[0]);
 			}

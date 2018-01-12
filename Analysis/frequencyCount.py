@@ -46,7 +46,8 @@ def ignoreUniqueWords(repeatedWords, group):
     topTen=[]
     #removing the group keywords from that list because we clearly know they are frequent and select the top 10 remaining
     for tup in repeatedWords:
-        if tup[1]not in group and n<15:
-            topTen.append(tup)
-            n+=1               
+        for word in group:
+            if tup[1]not in word and n<15:
+                topTen.append(tup)
+                n+=1               
     return topTen         

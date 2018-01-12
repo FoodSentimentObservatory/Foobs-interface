@@ -216,7 +216,7 @@ class ServerConnection(object):
 				keywordsToClusterEnriched = word2vec.getSimilarForListOfWords(keywordClusterList)
 			else:
 				keywordsToClusterEnriched=keywordClusterList	
-
+				
 			if self.group == 'no groups':
 				searchResult = keywordSearch.SearchResult(keywordsToClusterEnriched, self.fromDate, self.toDate, self.dbName, self.location, self.searchQuery,self.retweets)
 				self.tweetDictionary = searchResult.retrieveTweets()
@@ -231,8 +231,7 @@ class ServerConnection(object):
 			collectionsObject = collections.Collection(self.collectionId,self.cursor)
 			tweetCollectionDictionary = collectionsObject.showACollection()
 			self.tweetDictionary = resultsFiltering.filterTweets(tweetCollectionDictionary,keywordsToClusterEnriched)
-			listOfResultParameters = ["none", "none", "none", "none", "none"]	
-
+			listOfResultParameters = ["none", "none", "none", "none", "none"]		
 		cluster = donutVis.Cluster(self.tweetDictionary)
 		listOfCounts = cluster.getCounts(self.keywordsForSegmentsList)	
 		keywordsWithNoResults = cluster.getKeywordsWithNoResults(keywordsToClusterEnriched, listOfCounts)

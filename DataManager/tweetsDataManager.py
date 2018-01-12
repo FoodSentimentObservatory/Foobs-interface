@@ -4,7 +4,7 @@ import processingData.resultsFiltering as resultsFiltering
 
 def fetchingTweetsContainingGroups(cursor,location,searchQuery,listOfGroups, fromDate, toDate, retweets):
     allTweetResults=[]
-    for group in listOfGroups:
+    for group in listOfGroups:      
         groupTweetsResult= groupSearch(cursor, location,searchQuery, group,  fromDate, toDate,retweets)        
         allTweetResults.append(groupTweetsResult)
                
@@ -19,7 +19,8 @@ def groupSearch(cursor, location,searchQuery, group, fromDate, toDate, retweets)
     if group != 'all tweets':
         treshhold = len(group)
         strGroupOfTweets = ''.join(group)
-        noCommaGroupOfTweets = resultsFiltering.replaceChars(',', '', strGroupOfTweets)
+        charList = [",", " "]
+        noCommaGroupOfTweets = resultsFiltering.extraCharRemoval(strGroupOfTweets, charList,2)
     else:
         treshhold = 0  
         strGroupOfTweets = group

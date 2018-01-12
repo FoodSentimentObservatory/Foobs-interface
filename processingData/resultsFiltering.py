@@ -145,13 +145,15 @@ def splitStrOfGroups(group):
     if isinstance(group, str):
         if (group != 'no groups'):
             listofwords = group.split(",")
-            listOfGroups.append(listofwords)
+            cleanListOfWords = getCleanPhrasesAndWords(listofwords)
+            listOfGroups.append(cleanListOfWords)
         else:
             listOfGroups=['all tweets'] 
     else:
         for g in group:
-            singleGroup = g.split(",")
-            listOfGroups.append(singleGroup)
+            if g!= "":
+                cleanListOfWords = getCleanPhrasesAndWords(singleGroup)
+                listOfGroups.append(cleanListOfWords)        
 
     return listOfGroups            
 
@@ -190,6 +192,8 @@ def getTwitterLink(tweetId,userHandle):
 #as different strings can be split by different characters
 def createKeywordList(keywords, splitChar):
     if isinstance(keywords, str):
+        keywords=keywords.replace("\n","")
+        keywords = keywords.replace("\r","")
         if " OR " in keywords:
             keywordList = []
             groupList = keywords.split(" OR ")
@@ -245,4 +249,17 @@ def makeToList(keywordClusterList):
 
         newKeywordList.append(groupList)  
 
-    return newKeywordList                     
+    return newKeywordList     
+
+def getCleanPhrasesAndWords(group):
+    listOfCleanPhrasesAndWords = []
+    for word in group:
+        #checking if it's not an empty string
+        #e.g. the user has opened two keyword fields, but only typed
+        #in one and left the other one blanc
+        if word != "":
+            #removing the +s from phrases and replacing them with spaces
+            cleanPhrase = replaceChars("+", " ", word)
+            listOfCleanPhrasesAndWords.append(cleanPhrase)
+
+    return listOfCleanPhrasesAndWords    
