@@ -253,13 +253,19 @@ def makeToList(keywordClusterList):
 
 def getCleanPhrasesAndWords(group):
     listOfCleanPhrasesAndWords = []
-    for word in group:
-        #checking if it's not an empty string
-        #e.g. the user has opened two keyword fields, but only typed
-        #in one and left the other one blanc
-        if word != "":
-            #removing the +s from phrases and replacing them with spaces
-            cleanPhrase = replaceChars("+", " ", word)
-            listOfCleanPhrasesAndWords.append(cleanPhrase)
+    if isinstance(group, str):
+        cleanPhrase(group,listOfCleanPhrasesAndWords)
+    else:    
+        for word in group:      
+            cleanPhrase(word,listOfCleanPhrasesAndWords)
 
-    return listOfCleanPhrasesAndWords    
+    return listOfCleanPhrasesAndWords
+
+def cleanPhrase(phrase,listOfCleanPhrasesAndWords):
+    #checking if it's not an empty string
+    #e.g. the user has opened two keyword fields, but only typed
+    #in one and left the other one blanc
+    if phrase != "":
+        #removing the +s from phrases and replacing them with spaces
+        cleanPhrase = replaceChars("+", " ", phrase)
+        listOfCleanPhrasesAndWords.append(cleanPhrase)    
