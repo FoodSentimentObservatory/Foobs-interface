@@ -29,8 +29,13 @@ def getListOfCollection(database, listOfCollectionsWithDb):
 
 def getExistingCollections(cursor):
 	listOfCollections = sqlQueries.getExistingCollections(cursor)
-
-	return listOfCollections
+	listOfCollectionsFixed = []
+	for collection in listOfCollections:
+			collectionName = resultsFiltering.replaceChars('"', "", collection[1])
+			collectionDescription = resultsFiltering.replaceChars('"', "", collection[3])
+			collectionList = [collection[0], collectionName,collection[2], collectionDescription, collection[4],collection[5],collection[6]]
+			listOfCollectionsFixed.append(collectionList)
+	return listOfCollectionsFixed
 
 def getCollectionId(cursor, collectionId):
 	idOfCollection = sqlQueries.getCollectionId(cursor,collectionId) 
@@ -47,10 +52,14 @@ def searchForCollection(cursor, collectionId):
 
 	return check	
 
-def updateExistingCollection(cursor, collectionId, collectionName, collectionDescription,dateOfCreation):	
+def updateExistingCollection(cursor, collectionId, collectionName, collectionDescription,dateOfCreation):
+	collectionName = resultsFiltering.replaceChars("'", '"', collectionName)
+	collectionDescription = resultsFiltering.replaceChars("'", '"', collectionDescription)
 	sqlQueries.updateCollectionEntry(cursor, collectionId, collectionName, collectionDescription,dateOfCreation)  
 
 def createNewCollection(cursor, collectionId, collectionName, collectionDescription,dateOfCreation, tweetCount):
+	collectionName = resultsFiltering.replaceChars("'", '"', collectionName)
+	collectionDescription = resultsFiltering.replaceChars("'", '"', collectionDescription)
 	sqlQueries.createANewCollectionEntry(cursor, collectionId, collectionName, collectionDescription,dateOfCreation, tweetCount)	
 
 def saveCollectionParameters(cursor, idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetCount,retweets):

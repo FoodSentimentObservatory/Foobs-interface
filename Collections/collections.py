@@ -26,6 +26,7 @@ class Collection():
 
 		self.idOfCollection = collectionsDataManager.getCollectionId(self.cursor,self.collectionId)
 		#save the collection parameter entry in the database
+		print(groupOfKeywords)
 		collectionsDataManager.saveCollectionParameters(self.cursor, self.idOfCollection, groupOfKeywords, searchQuery, location, fromDate, toDate, tweetsCount,retweets)
 
 	#updates a collection, triggered by the update modal on the collections page

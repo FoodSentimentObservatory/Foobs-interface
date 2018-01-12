@@ -41,7 +41,7 @@ class Cluster:
 						if checkIfExists==1:
 							count += checkIfExists
 							tweetTup = tweet[0]+"|"+tweet[2]+"|"+ wordStr+"|"+key+"|"+tweet[1]+"|"+tweet[3]+"|"+tweet[4]+"|"+tweet[7]
-							tweetsTupList=(tweet[0],tweet[2],wordStr,key,tweet[1],tweet[3],tweet[4],tweet[7], tweet[8])
+							tweetsTupList=(tweet[0],tweet[1],tweet[2],tweet[3],tweet[4],wordStr,key,tweet[7], tweet[8])
 							#this list will be used to display all tweets once the donut has been loaded
 							self.filteredTweetsList.append(tweetsTupList)
 							#this is a stringified version of the list, which will be passed to the javaScript
@@ -71,6 +71,7 @@ class Cluster:
 	# tweets containing segment keywords
 	def getCounts(self,keywordsForSegmentsList):	
 		listOfCounts=[]
+		tenOrMore = []
 		for key, value in self.tweetDictionary.items():
 			countOftweets=0
 			for word in keywordsForSegmentsList:
@@ -84,10 +85,12 @@ class Cluster:
 						if count==len(word):
 							countOftweets += 1	
 			#if there are any tweets with any of the segment keywords, add to the count list			
-			if countOftweets>0:		
+			if countOftweets>0:
+				if countOftweets>=10:
+					tenOrMore.append(v[6])		
 				countTup = (key, countOftweets, v[6])
 				listOfCounts.append(countTup)
-	
+		print(tenOrMore)
 		#ordering the final count list by count of tweets
 		orderedListOfCounts = sorted(listOfCounts, key=itemgetter(1), reverse=True)
 

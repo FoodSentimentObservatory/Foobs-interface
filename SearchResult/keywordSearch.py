@@ -24,7 +24,13 @@ class SearchResult:
 #retrieves all collections from db and passes it to controller		
 	def listOfCollections(self):	
 		listOfCollections = collectionsDataManager.getExistingCollections(self.cursor)
-		return listOfCollections
+		listOfCollectionsFixed = []
+		for collection in listOfCollections:
+			collectionName = resultsFiltering.replaceChars('"', "'", collection[1])
+			collectionDescription = resultsFiltering.replaceChars('"', "'", collection[3])
+			collectionList = [collection[0], collectionName,collection[2], collectionDescription, collection[4],collection[5],collection[6]]
+			listOfCollectionsFixed.append(collectionList)
+		return listOfCollectionsFixed
 #splits the string input of keywords into a list of lists
 	def listOfGroups(self):
 		listOfGroups=resultsFiltering.splitStrOfGroups(self.group)	

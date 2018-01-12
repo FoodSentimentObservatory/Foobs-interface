@@ -378,6 +378,7 @@ function changeValues(){
 	document.getElementById('groupOfKeywords').value = keywordGroup;
 	console.log(document.getElementById('groupOfKeywords').value);	
 	document.getElementById('dbName').value= localStorage['dbName'];
+	console.log(localStorage['countOfTweets']);
 	document.getElementById('tweetsCount').value = localStorage['countOfTweets'];
 
 };

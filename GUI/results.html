@@ -8,7 +8,7 @@
     <title>FoObs Results</title>
   </head>
 
-  <body>
+  <body onload="setLocalStorageForCount('{{groupList[0][3]}}');changeKeywords('{{groupList[0][1]}}')">
     {% include "parts/menu.html" %} 
     <div class="container" id="mainContainer">
     

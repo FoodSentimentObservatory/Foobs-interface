@@ -152,7 +152,7 @@ def splitStrOfGroups(group):
     else:
         for g in group:
             if g!= "":
-                cleanListOfWords = getCleanPhrasesAndWords(singleGroup)
+                cleanListOfWords = getCleanPhrasesAndWords(g)
                 listOfGroups.append(cleanListOfWords)        
 
     return listOfGroups            
@@ -268,4 +268,4 @@ def cleanPhrase(phrase,listOfCleanPhrasesAndWords):
     if phrase != "":
         #removing the +s from phrases and replacing them with spaces
         cleanPhrase = replaceChars("+", " ", phrase)
-        listOfCleanPhrasesAndWords.append(cleanPhrase)    
+        listOfCleanPhrasesAndWords.append(cleanPhrase)        
