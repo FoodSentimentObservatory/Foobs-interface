@@ -51,12 +51,14 @@
 						<div class="col-sm-12" id="addOwnWordsClusters"></div>
 					</div>
 					
-				</div> 
+				</div>
+				<div class='enrichCheckBox col-sm-6' id='enrichCheckBox'></div>
+				<div class='numberOfEnrichments col-sm-6' id='numberOfEnrichments'></div> 
 				<div class="col-sm-12" id="fileInputOption">
 						<div id="orDiv"><h4>OR</h4></div>
 							<input type="file" name="clusterOption" id="fileOption" value="" accept=".txt" onchange='readText(this)'>
 							<h2><label for="fileOption"><span class="label label-warning">Upload keyword file</span></label></h2>
-							<input id="uploadFile" placeholder="Filename" disabled="disabled" />
+							<div id="fileInputKeyWords"></div>
 					</div>   
 			</div>
 
@@ -90,14 +92,14 @@
 			<input type="hidden" name="keywordsForSegments" id="keywordsForSegments" value="" />
 			<input type="hidden" name="enrichKeywords" id="enrichKeywords" value="" />
 			<input type="hidden" name="task" id="task" value="{{task}}">
+			<input type="hidden" name="numOfEnrichments" id="numOfEnrichments" value="no enrichments"/>
 			<div class="bottom col-sm-12"><button type='submit' class='btn btn-success' id="floatyButton">Cluster</button></div>				
 		</form>	
 		<input type="hidden" name="keywordInputName" id="keywordInputName" value=""/>
 	</div>
 	{% include "parts/modals/clusterSpecModal.html" %}
 	</div>
-		<script src='/static/js/bootstrap.min.js'></script>
-		<script src='http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js'></script>
+		<script src="/static/js/bootstrap.min.js"></script>
 		<script src = "/static/js/scripts.js"></script>	
 	</body>
 </html>			

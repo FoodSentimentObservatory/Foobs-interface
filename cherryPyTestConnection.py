@@ -79,7 +79,7 @@ class ServerConnection(object):
 	@cherrypy.expose	
 	def frequentKeywordSearch(self,group, tweets, word,groupIdStr,groupOriginalName):
 		frequentWordResult = frequentKeywordsResult.FrequentKeywordsResult(group, tweets, word,groupIdStr,groupOriginalName)
-		orderedFreqKeywordTweetDict = frequentWordResult.returnDictionaryOfTweets()
+		orderedFreqKeywordTweetDict = frequentWordResult.returnurnDictionaryOfTweets()
 		groupList = frequentWordResult.returnFrequentWordsGroupList()
 
 		template = env.get_template('freqResults.html')
@@ -167,7 +167,6 @@ class ServerConnection(object):
 			conn = dataManager.startDbConnection(dbName)	
 			self.cursor = conn.cursor()	
 			html = testScatterText.visualiseCollections(self.cursor,twoCollectionId)
-			conn.close()
 			return html		
 
 	@cherrypy.expose
@@ -208,12 +207,12 @@ class ServerConnection(object):
 	#searches for tweets for the selected cluster and segment keywords
 	#loads clusters stats page	
 	@cherrypy.expose	
-	def createClusters(self, keywordsToCluster, keywordsForSegments, enrichKeywords, task):
+	def createClusters(self, keywordsToCluster, keywordsForSegments, enrichKeywords, task, numOfEnrichments):
 		keywordClusterList = resultsFiltering.createKeywordList(keywordsToCluster,',')	
 		self.keywordsForSegmentsList = resultsFiltering.createKeywordList(keywordsForSegments,';')
 		if task=="dataset":
 			if enrichKeywords == 'enrich':		
-				keywordsToClusterEnriched = word2vec.getSimilarForListOfWords(keywordClusterList)
+				keywordsToClusterEnriched = word2vec.getSimilarForListOfWords(keywordClusterList,numOfEnrichments)
 			else:
 				keywordsToClusterEnriched=keywordClusterList	
 				

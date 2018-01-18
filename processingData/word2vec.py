@@ -1,12 +1,12 @@
 import urllib.parse
 import urllib.request
 
-def getSimilarForASingleWord(word): 
+def getSimilarForASingleWord(word,numOfEnrichments): 
  url = 'http://bionlp-www.utu.fi/wv_demo/nearest'
  values = {'form[0][name]' : 'word',
           'form[0][value]' : word,
           'form[1][name]' : 'topn',
-          'form[1][value]' : '100',
+          'form[1][value]' : numOfEnrichments,
           'model_name' : 'English GoogleNews Negative300' }
 
  data = urllib.parse.urlencode(values)
@@ -25,13 +25,13 @@ def getSimilarForASingleWord(word):
   
    return set(list)  
 
-def getSimilarForListOfWords(words):
+def getSimilarForListOfWords(words,numOfEnrichments):
   resultSet = set() 
   listOfWords=[]
   for word in words:
     listOfWords.append(word)
     wordSet = set(word) 
-    resultSet = resultSet | getSimilarForASingleWord(word) | wordSet
+    resultSet = resultSet | getSimilarForASingleWord(word,numOfEnrichments) | wordSet
 
    
   for word in resultSet:

@@ -86,7 +86,7 @@ $('#keywordGroupShow').on('click', '.close', function(events){
 	$(this).parents('div').eq(1).remove();
 	document.getElementById("check").value="no groups";
 });
-
+//used to count how many checkboxes have been selected for visualisation
 function countCheckboxes(checkboxValueList){
 	var count = 0;
 	var vals ="";
@@ -106,7 +106,9 @@ function countCheckboxes(checkboxValueList){
 //checks if every section of the homepage form has a value	
 function validateForm()	{
 	var formAction = document.getElementById('searchSpecs').action;
-
+//on submit of index page form, checks if the relevant fields have been selected
+//and returns an error message if they haven't
+//based on the form action value
 	if (formAction.match(/^.*connectToScript$/)){
 			var discourse = document.forms["searchSpecs"]["searchnoteID"].value;
 			if (discourse == ""){
@@ -116,7 +118,6 @@ function validateForm()	{
 			    return false;
 			}
 	}else if(formAction.match(/^.*clusterFromDataSet$/)){
-			console.log('something')
 			return true;
 	}else if(formAction.match(/^.*collectionClusterParams$/)){
 			var collection = document.forms["searchSpecs"]["collectionId"].value;
@@ -127,7 +128,6 @@ function validateForm()	{
 			    return false;
 			}
 	}else{
-			console.log("test");
 			console.log(formAction);
 			var collections = document.getElementsByName('collectionRow');
 			var checkBoxData = countCheckboxes(collections);
@@ -145,7 +145,6 @@ function validateForm()	{
 				
 			}
 		}
-	
 };
 function loadingScreen(){
 	$(".se-pre-con").show();
@@ -175,6 +174,9 @@ $('#kGroupModal').on('hidden.bs.modal', function () {
 		.val('')
 		.end()
 });
+//on load of the saveToCollectionModal in the results page
+//clean the modal and diasble the typing area
+//until a collection option has been selected
 $('#collectionsModal').on('hidden.bs.modal', function () {
 	$(this)
 		.find("input,textarea,select")
@@ -192,8 +194,7 @@ $(window).bind("pageshow", function() {
   $("#whitie").show();
   $(".se-pre-con").fadeOut("slow");
 });
-	
-
+//sets the db name in the index page on selection of sprint	
 function setDb(dbName, notDbName){
 	$(".collapse").collapse("hide");
 	document.getElementById("dbName").value = dbName;
@@ -211,7 +212,7 @@ function changeFooter(){
 	document.getElementById('footerId').style.position='relative';
 };
 
-//function to display information on click of each search button
+//function to display information on click of each search option in the index page
 function displaySearchData(searchName,earliest,latest,keywordString, total, coordinates, firstSearch, lastSearch, countOfSearches){
 	//processing the coordinates from string python list to a json array	
 	var coordinatesList = [];
@@ -244,12 +245,11 @@ function displaySearchData(searchName,earliest,latest,keywordString, total, coor
 	console.log(jsonPointListStr);
 	//creating the map with the relevant coordinates
 	initMap(jsonPointList);
-
+	//setting the hidden values that will be passed to the python script once
+	//the form is submitted
 	document.getElementById("start").value = earliest;
-	document.getElementById("endof").value = latest;
-	console.log(document.getElementById("endof").value);
-		
-
+	document.getElementById("endof").value = latest;		
+	//the layout of the search data
 	layout = "<div class='info'><h4>"+searchName+"</h4><div class='tabbable-panel'><div class='tabbable-line'>\
 		<ul class='nav nav-tabs'><li class='active'><a href='#provenance' data-toggle='tab'>Provenance of the search </a></li>\
 		<li><a href='#dataQualities' data-toggle='tab'>Dataset information</a></li></ul>\
@@ -262,6 +262,8 @@ function displaySearchData(searchName,earliest,latest,keywordString, total, coor
 
 	document.getElementById("searchData").innerHTML=layout;	
 };	
+//setting the keywords from the search selected on the index page into local storage
+//to be used for autocomplete in the addKeywordsGroupsModal
 function setLocalStorage(keywordsList){
 	var keyword = keywordsList;
     localStorage.setItem( 'objectToPass', keyword );
@@ -739,20 +741,39 @@ function Cluster(cluster){
 $('#radioBtn a').on('click', function(){
     var sel = $(this).data('title');
     var tog = $(this).data('toggle');
+    console.log(sel);
     $('#'+tog).prop('value', sel);
     
     $('a[data-toggle="'+tog+'"]').not('[data-title="'+sel+'"]').removeClass('active').addClass('notActive');
     $('a[data-toggle="'+tog+'"][data-title="'+sel+'"]').removeClass('notActive').addClass('active');
-    if(document.getElementById('checkIfKeywords').value=="Y"){
-    	showAddKeywordButton('eitherOrContent','Add a keyword group');
-    	document.getElementById("check").value="display error";
-    }else if (document.getElementById('checkIfKeywords').value=="N"){
-    	hiddenInputs = "<input type='hidden' name='groups' value='no groups'/><input type='hidden' name='group' value='no groups'/>"
-    	document.getElementById('eitherOrContent').innerHTML=hiddenInputs;
-    }
-
+    if (tog=='checkIfKeywords'){
+	    if(document.getElementById('checkIfKeywords').value=="Y"){
+	    	showAddKeywordButton('eitherOrContent','Add a keyword group');
+	    	document.getElementById("check").value="display error";
+	    }else if (document.getElementById('checkIfKeywords').value=="N"){
+	    	hiddenInputs = "<input type='hidden' name='groups' value='no groups'/><input type='hidden' name='group' value='no groups'/>"
+	    	document.getElementById('eitherOrContent').innerHTML=hiddenInputs;
+	    }
+	}else if (tog=='keywordEnrichments'){
+		console.log(sel);
+	}
 });
+function toggleButtons(that){
+	var sel = $(that).data('title');
+    var tog = $(that).data('toggle');
+    $('#'+tog).prop('value', sel);
+    
+    $('a[data-toggle="'+tog+'"]').not('[data-title="'+sel+'"]').removeClass('active').addClass('notActive');
+    $('a[data-toggle="'+tog+'"][data-title="'+sel+'"]').removeClass('notActive').addClass('active');
 
+    if(sel == 'Y'){
+    	numberOfEnrichmentsDiv= "<div class='form-group col-md-10'><label for='enrichmentNumber'>Number of enrichments per word:</label>\
+    	<div class='col-md-8'><input type='text' class='form-control' id='enrichmentNumber'></div></div>";
+    	document.getElementById('numberOfEnrichments').innerHTML=numberOfEnrichmentsDiv;
+    }else{
+    	document.getElementById('numberOfEnrichments').innerHTML="";
+    }
+}
 function showKeywordGroups(keywordGroup, task){
 	if (task =='dataset'){
 		if (keywordGroup=='no groups'){
@@ -793,7 +814,10 @@ function createLabelsForKeywords(keyword, letters){
 				}						
 				if (i<keyword.length-1){
 						searchString+=",";
-				} 
+				}
+				if (i<keyword.length-1){
+					searchString+=",";
+				}	 
 			} else {
 				keywordLayout = "<div class='alert alert-danger' role='alert'>Please, use only \
 				alphabetical characters, '.' or '-'</div>";
@@ -805,6 +829,7 @@ function createLabelsForKeywords(keyword, letters){
 	var keywordEntitiesArray = [searchString, keywordLayout];
 	return keywordEntitiesArray;	
 };
+
 function saveAndDisplayKeywords(){
 	var div = createAContainerForKeywords();
 	var keyword = document.getElementsByName("kgroups")
@@ -817,12 +842,15 @@ function saveAndDisplayKeywords(){
  			<span aria-hidden="true">&times;</span></button></div><div class="btn-group" data-toggle="buttons" style="width: 100%;">';
  		var keywordEntitiesArray = createLabelsForKeywords(keyword, letters);
 		console.log(keywordEntitiesArray[0]);
-		layout = layout + keywordEntitiesArray[1] + "<input type='hidden' name='"+keywordInputName+"' id='"+keywordInputName+"' value="+keywordEntitiesArray[0]+">\
-		</div><div class='enrichCheckBox col-sm-12' id='enrichCheckBox'><input type='checkbox' name='keywordEnrichments' id='keywordEnrichments' value='enrich'>\
-		Enrich keywords </div>";
-		
+		layout = layout + keywordEntitiesArray[1] + "<input type='hidden' name='"+keywordInputName+"' id='"+keywordInputName+"' value="+keywordEntitiesArray[0]+"></div>";
 		div.innerHTML = layout;
-		
+		enrichment = "<div class='col-sm-12' id='retweet'><label for='keywordEnrichments' class='col-sm-12 col-md-12 control-label text-left'>Enrich keywords?</label>\
+					  <div class='col-sm-12 col-md-12'><div class='input-group'><div id='radioBtn' class='btn-group'>\
+					  <a class='btn btn-success btn-sm notActive' data-toggle='keywordEnrichments' data-title='Y' onclick = 'toggleButtons(this)'>YES</a>\
+					  <a class='btn btn-success btn-sm active' data-toggle='keywordEnrichments' data-title='N' onclick = 'toggleButtons(this)'>NO</a></div>\
+					  <input type='hidden' name='keywordEnrichments' id='keywordEnrichments' value='N'></div></div></div>";
+
+		document.getElementById('enrichCheckBox').innerHTML = enrichment;
 		document.getElementById("errorMessageArea").innerHTML = "";
 		document.getElementById("keywordGroupShow").appendChild(div);
 
@@ -853,6 +881,7 @@ function setKeywordsToCluster(keywords){
 	document.getElementById('keywordsToCluster').value = newKeywordStr;
 	console.log(document.getElementById('keywordsToCluster').value);
 	document.getElementById("errorClusterArea").innerHTML = "";
+
 };
 function setKeywordsForSegment(keywords){
 	if (keywords.indexOf(",") != -1){
@@ -878,9 +907,13 @@ function hideOtherContent(selectedContent){
 	if(selectedContent=="searchWords"){
 		document.getElementById('showkeywordGroup').style.display = 'none';
 		document.getElementById('addOwnWordsClusters').innerHTML="";
+		document.getElementById('enrichCheckBox').innerHTML="";
+	document.getElementById('numberOfEnrichments').innerHTML="";
 	}else if(selectedContent=="keywordGroups"){
 		document.getElementById('searchKeywords').style.display = 'none'
-		document.getElementById('addOwnWordsClusters').innerHTML="";		
+		document.getElementById('addOwnWordsClusters').innerHTML="";
+		document.getElementById('enrichCheckBox').innerHTML="";
+	document.getElementById('numberOfEnrichments').innerHTML="";		
 	}else{
 		document.getElementById('searchKeywords').style.display = 'none';
 		document.getElementById('showkeywordGroup').style.display = 'none';
@@ -888,7 +921,7 @@ function hideOtherContent(selectedContent){
 	}
 }; 
 function validateClusterForm(){
-	var enrichedCheckbox = document.getElementsByName('keywordEnrichments');
+	var enrichedCheckbox = document.getElementById('keywordEnrichments').value;
 	if (document.forms["clusterForm"]["keywordsToCluster"].value==""){
 		alertMessageDiv= "<div class='alert alert-danger' role='alert'><strong>Whops</strong> \
 		You forgot to specify keywords for clusters.</div>";
@@ -901,8 +934,18 @@ function validateClusterForm(){
 		return false;
 	}else if (enrichedCheckbox.length>0){
 			console.log(enrichedCheckbox);	
-			if (enrichedCheckbox[0].checked){
-				document.getElementById('enrichKeywords').value='enrich';
+			if (enrichedCheckbox=='Y'){
+				var numberOfEnrichments = document.getElementById('enrichmentNumber').value;
+				if (numberOfEnrichments!=""){
+					document.getElementById('numOfEnrichments').value=numberOfEnrichments;
+					document.getElementById('enrichKeywords').value='enrich';
+				}else{
+					errorMessage="<div class='alert alert-danger' role='alert'>\
+			    	Please specify the number of enrichments for the clustering.</div>"
+					document.getElementById('errorClusterArea').innerHTML=errorMessage;
+					return false;
+				}
+				
 			}else{
 				document.getElementById('enrichKeywords').value='do not';
 			}
@@ -934,13 +977,32 @@ function readText(that){
 				reader.onload = function (e) {  
 					var output=e.target.result;
 					var newStr = output.replace(/\n/g,",");
+					var outputList = output.split("\n");
+					var div = createAContainerForKeywords();
+					var letters = /^[A-Za-z.\-\'\s]+$/;
+					layout = '<div class="btn-group" data-toggle="buttons" style="width: 100%;">';
+ 					var keywordLayout = "";
+
+ 					for (let i=0; i<outputList.length; i++){
+ 						keywordLayout+="<div class='label label-success col-sm-5 addSpace'>"+ outputList[i]+"</div>";	
+ 					}
+					layout = layout + keywordLayout+"</div>";
+					
+					document.getElementById("fileInputKeyWords").innerHTML=layout;
 					document.getElementById('keywordsToCluster').value = newStr;
-					console.log(newStr);
+
+					enrichment = "<div class='col-sm-12' id='retweet'><label for='keywordEnrichments' class='col-sm-12 col-md-12 control-label text-left'>Enrich keywords?</label>\
+					  <div class='col-sm-12 col-md-12'><div class='input-group'><div id='radioBtn' class='btn-group'>\
+					  <a class='btn btn-success btn-sm notActive' data-toggle='keywordEnrichments' data-title='Y' onclick = 'toggleButtons(this)'>YES</a>\
+					  <a class='btn btn-success btn-sm active' data-toggle='keywordEnrichments' data-title='N' onclick = 'toggleButtons(this)'>NO</a></div>\
+					  <input type='hidden' name='keywordEnrichments' id='keywordEnrichments' value='N'></div></div></div>";
+
+					document.getElementById('enrichCheckBox').innerHTML = enrichment;
+					document.getElementById('addOwnWordsClusters').innerHTML="";
 				};
 				reader.readAsText(that.files[0]);
 			}
-	var linkList = that.value.split("\\");		
-	document.getElementById("uploadFile").value = linkList[2];		
+		
 };
 function setLocalStorageForCount(countOfTweets){
 	localStorage.setItem( 'countOfTweets', countOfTweets );

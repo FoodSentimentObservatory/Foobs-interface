@@ -381,7 +381,8 @@ ul.ui-autocomplete {
 	padding-top: 2px;
 }
 #provenance,
-#searchKeywords{
+#searchKeywords,
+#fileInputKeyWords{
 	max-height: 250px;
 	overflow-y: scroll;
 }
