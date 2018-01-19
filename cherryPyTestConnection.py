@@ -77,9 +77,9 @@ class ServerConnection(object):
 
 	#script for the frequent keywords search	
 	@cherrypy.expose	
-	def frequentKeywordSearch(self,group, tweets, word,groupIdStr,groupOriginalName):
+	def frequentKeywordSearch(self,group, tweets, word,groupIdStr,groupOriginalName,numberOfTweets):
 		frequentWordResult = frequentKeywordsResult.FrequentKeywordsResult(group, tweets, word,groupIdStr,groupOriginalName)
-		orderedFreqKeywordTweetDict = frequentWordResult.returnurnDictionaryOfTweets()
+		orderedFreqKeywordTweetDict = frequentWordResult.returnDictionaryOfTweets()
 		groupList = frequentWordResult.returnFrequentWordsGroupList()
 
 		template = env.get_template('freqResults.html')

@@ -319,18 +319,16 @@ $(function(){
  	})
 
  });
+//function to set the default values for the datetimepicker
 $('#datetimepicker').datetimepicker({
     onSelect: function(dateText, inst) {
     	var fromDate = document.getElementById("fromDate").value; 
     	var toDate = document.getElementById("toDate").value;
     	localStorage.setItem( 'fromDate', fromDate );  
-    	localStorage.setItem('toDate', toDate);
-
-    	console.log(localStorage['fromDate']);
-    	console.log(localStorage['toDate']);   
+    	localStorage.setItem('toDate', toDate);  
     }
 });
-
+//function for the autocomplete in the keywordSearch.html page
 $("input[name='kgroups']").autocomplete({
   	source: function( request, response ) {
         var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
@@ -339,6 +337,8 @@ $("input[name='kgroups']").autocomplete({
         }) );
     }
 });
+//function used by the saveToCollectionModal, called in result.html
+//sets the hidden values in the modal for form submition
 function changeValues(){
 	var collectionSelection = document.getElementById("listOfCollections");
 	var collectionStr = collectionSelection.options[collectionSelection.selectedIndex].value;
@@ -373,28 +373,24 @@ function changeValues(){
 		today = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + ii;
 
 	document.getElementById('dateOfCreation').value = today;
-	console.log(document.getElementById('dateOfCreation').value);
 
 	keywordGroup = document.getElementById('groupOriginalName').value;
-	console.log(keywordGroup);
 	document.getElementById('groupOfKeywords').value = keywordGroup;
-	console.log(document.getElementById('groupOfKeywords').value);	
 	document.getElementById('dbName').value= localStorage['dbName'];
-	console.log(localStorage['countOfTweets']);
 	document.getElementById('tweetsCount').value = localStorage['countOfTweets'];
 
 };
 
 
 $(document).ready(function(){
-$("#mytable #checkall").click(function () {
-        if ($("#mytable #checkall").is(':checked')) {
-            $("#mytable input[type=checkbox]").each(function () {
+$("#collectionsTable #checkall").click(function () {
+        if ($("#collectionsTable #checkall").is(':checked')) {
+            $("#collectionsTable input[type=checkbox]").each(function () {
                 $(this).prop("checked", true);
             });
 
         } else {
-            $("#mytable input[type=checkbox]").each(function () {
+            $("#collectionsTable input[type=checkbox]").each(function () {
                 $(this).prop("checked", false);
             });
         }
@@ -428,13 +424,7 @@ function setCollectionDateForEdit(name, description, collectionId, collectionDbI
 	document.getElementById('descriptionOfProject').value = description;
 	document.getElementById('collectionId').value = collectionId;
 	document.getElementById('timeStamp').value = today;
-	document.getElementById('checkBoxArea').innerHTML = checkboxInputs;
-
-	console.log(document.getElementById('nameOfProject').value);
-	console.log(document.getElementById('descriptionOfProject').value);
-	console.log(document.getElementById('collectionId').value);
-	console.log(document.getElementById('timeStamp').value);
-	
+	document.getElementById('checkBoxArea').innerHTML = checkboxInputs;	
 };
 //function to get the unique id of the collection to be deleted
 function setCollectionId(collectionId){
@@ -467,8 +457,6 @@ $('input.checkthis').on('change', function(evt) {
 
 function changeKeywords(keywordGroup){
 	document.getElementById('groupOriginalName').value = keywordGroup;
-	console.log(document.getElementById('groupOriginalName').value);
-	console.log(keywordGroup);
 };
 //what data to be shown based on the databse selected, needs to be refined for the case of more dbs
 function selectDataToBeShown(database,notDatabase){
@@ -576,7 +564,7 @@ function closeAccordions(){
 		$("#selectCollection").collapse("hide");
 		$("#filterKeywords").collapse("hide");
 }
-//for the filter keywords functionality
+//for what data to ve shown on the index page onclick
 function specifyTaskDataToBeShown(task){
 	if (task=='clusterDataset'){
 		var extention='_key';
@@ -604,10 +592,7 @@ function specifyTaskDataToBeShown(task){
 			notDatabase+= ";"+notDbNameId;
 		}
 	}
-
 	selectDataToBeShown(database,notDatabase);
-
-
 };
 //for the collection functionality
 function selectCollectionDataToBeShown(radioId){
@@ -651,7 +636,7 @@ function setHiddenValues(keywordString, searchQuery, location, fromDate, toDate)
 
 	console.log(document.getElementById('searchQuery').value);
 };
-
+//donut creation
 function createDonuts(clustersString){
 	if (clustersString.includes(";")==true){
 		var mainClustersList = clustersString.split(';')
@@ -724,7 +709,7 @@ function donutGen(listOfClusters, total){
     $('#legend').append(legendItem)
   })
 };
-
+//generates a random color for donut segment
 function getRandomColor() {
   var letters = '0123456789ABCDEF';
   var color = '#';
@@ -732,12 +717,13 @@ function getRandomColor() {
     color += letters[Math.floor(Math.random() * 16)];
   }
   return color;
-}
+};
+
 function Cluster(cluster){
 	this.label = cluster[0];
 	this.value = cluster[2];
 };
-
+// used in keywordSearch.html-> to hide/show the add keyword button
 $('#radioBtn a').on('click', function(){
     var sel = $(this).data('title');
     var tog = $(this).data('toggle');
@@ -758,6 +744,8 @@ $('#radioBtn a').on('click', function(){
 		console.log(sel);
 	}
 });
+//same function as above but for the enrichment button in clusterspecform.html
+//as part of the code above it wasn't working for some reason, but it works as a onclick function
 function toggleButtons(that){
 	var sel = $(that).data('title');
     var tog = $(that).data('toggle');
@@ -774,6 +762,8 @@ function toggleButtons(that){
     	document.getElementById('numberOfEnrichments').innerHTML="";
     }
 }
+//in clusterSpecForm.html, disabling option based on
+//whether clustering collection or dataset
 function showKeywordGroups(keywordGroup, task){
 	if (task =='dataset'){
 		if (keywordGroup=='no groups'){
@@ -790,7 +780,6 @@ function showKeywordGroups(keywordGroup, task){
 		layout="<p>"+keywordGroup+"</p>";
 		document.getElementById('showkeywordGroup').innerHTML=layout;
 	}
-	
 };
 function showAddKeywordButton(divId, buttonTitle,keywordInputName){
 	layout = "<div class='col-sm-10' id='keywordGroupShow'><div id='errorArea'></div></div><div id='keywordGroupModalDiv' class='keywordGroupModal col-xs-8'>\

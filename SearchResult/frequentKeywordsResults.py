@@ -71,7 +71,8 @@ class FrequentKeywordsResult:
 		index=5
 		freqWordTweetsDict = resultsFiltering.dictionaryGen(self.newGroups,index)
 		self.orderedFreqKeywordTweetDict = collections.OrderedDict(sorted(freqWordTweetsDict.items()))
-
+		for key, value in self.orderedFreqKeywordTweetDict.items():
+			print(key)
 		return self.orderedFreqKeywordTweetDict	
 #returns a list of data to be used by the upper part of the frequent results page
 	def returnFrequentWordsGroupList(self):
@@ -81,7 +82,8 @@ class FrequentKeywordsResult:
 			numberOfTweets=len(value)
 			groupId=self.originalStringGroupId+key
 			groupString=self.originalGroupName+","+key
-			frequentWords = frequencyCount.frequencyCount(value,groupString)
+			keywordGroupList = groupString.split(',')
+			frequentWords = frequencyCount.frequencyCount(value,keywordGroupList)
 			listForInputValues=[]
 			for tweet in self.tweetDataListNoHtmlTags:
 				if key in tweet[0].lower():
@@ -89,5 +91,5 @@ class FrequentKeywordsResult:
 			groupTup = (key, groupString,i,numberOfTweets,frequentWords, listForInputValues)
 			groupList.append(groupTup)
 			i+=1				
-
+			
 		return groupList

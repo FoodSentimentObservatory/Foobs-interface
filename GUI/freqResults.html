@@ -16,7 +16,15 @@
       <!-- generating the tabs from a list of group data -->
       <h4>{{groupOriginalName}} + ..</h4>
 
-      {% include "parts/tabs.html" %}   
+      <ul class='nav nav-tabs'>
+        {% for group in groupList %}
+            {% if group[0] == word %}
+              <li class='active'><a data-toggle='tab' href='#{{group[0]}}' role="tab" onclick="changeKeywords('{{group[1]}}'); checkForResults('{{group[3]}}','{{group[1]}}'); setLocalStorageForCount('{{group[3]}}')">{{group[1]}}</a></li>
+            {% else %}
+              <li><a data-toggle='tab' href='#{{group[0]}}' role="tab" onclick="changeKeywords('{{group[1]}}'); checkForResults('{{group[3]}}','{{group[1]}}'); setLocalStorageForCount('{{group[3]}}')">{{group[1]}}</a></li> 
+            {% endif %}           
+        {% endfor %}     
+      </ul>   
       <div class='tab-content'>   
       <!--each tab content is a separate item of a dictionary -->
       {% for key, values in dicw.items() %}
