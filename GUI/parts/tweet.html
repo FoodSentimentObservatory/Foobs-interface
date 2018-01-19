@@ -1,5 +1,5 @@
-<div class='col-xs-8' id='tweet'>
-  <div class='col-xs-6' id='author'>
+<div class='col-xs-8 tweet'>
+  <div class='col-xs-6 author'>
     {% if tweet[3]=='True' %}
       <span style='color:#FFF;'>{{tweet[4]}}</span> <span style='color:#D3D3D3;'>@{{tweet[2]}}</span> 
       <span class='glyphicon glyphicon-ok blue'></span>
@@ -7,7 +7,7 @@
       <span style='color:#FFF;'>{{tweet[4]}}</span> <span style='color:#D3D3D3;'>@{{tweet[2]}}</span> 
     {% endif %}  
   </div>
-  <div class='col-xs-3' id='time'>{{tweet[1]}}</div>
+  <div class='col-xs-3 time'>{{tweet[1]}}</div>
   <div class="col-xs-3"><a href="{{tweet[7]}}" target="_blank">Show tweet on Twitter</a></div>
-  <div class='col-xs-12' id='tweetText'>{{tweet[8]}}<br></div>
+  <div class='col-xs-12 tweetText'>{{tweet[8]}}<br></div>
 </div>

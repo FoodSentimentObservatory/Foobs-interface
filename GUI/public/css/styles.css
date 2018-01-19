@@ -61,7 +61,7 @@ fieldset {
 .tableMain{
 	padding: 10px;
 }
-#tweet {
+.tweet {
 	background: #091741;
 	border: 1px solid #E6E6FA;
 	border-bottom: 3px solid #336699;
@@ -75,17 +75,17 @@ fieldset {
 	border: 1px solid #E6E6FA;
     border-radius: 6px;
 }
-#tweetText {
+.tweetText {
 	margin-top:0.5em;
 	margin-bottom: 0.5em;
 	background: white;
 	border: 1px solid #E6E6FA;
 	border-radius: 4px;
 }
-#author{
+.author{
 	font-weight: bold;
 }
-#time{
+.time{
 	font-weight: bold;
 	color:#fff;
 }

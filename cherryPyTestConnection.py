@@ -68,17 +68,17 @@ class ServerConnection(object):
 		self.retweets = checkIfRetweets	
 		searchResult = keywordSearch.SearchResult(self.group, self.fromDate, self.toDate, self.dbName, self.location, self.searchQuery,self.retweets)
 		listOfCollections = searchResult.listOfCollections()
-		tweetDictionary = searchResult.retrieveTweets()
+		self.tweetDictionary = searchResult.retrieveTweets()
 		groupList = searchResult.getGroupList()
 		queryDataList = searchResult.getQueryData()
 
 		template = env.get_template('results.html')
-		return template.render(dicw=tweetDictionary, listOfCollections=listOfCollections, groupList=groupList, i=0, queryData = queryDataList)
+		return template.render(dicw=self.tweetDictionary, listOfCollections=listOfCollections, groupList=groupList, i=0, queryData = queryDataList)
 
 	#script for the frequent keywords search	
 	@cherrypy.expose	
-	def frequentKeywordSearch(self,group, tweets, word,groupIdStr,groupOriginalName,numberOfTweets):
-		frequentWordResult = frequentKeywordsResult.FrequentKeywordsResult(group, tweets, word,groupIdStr,groupOriginalName)
+	def frequentKeywordSearch(self,group, word,groupIdStr,groupOriginalName,numberOfTweets):
+		frequentWordResult = frequentKeywordsResult.FrequentKeywordsResult(group, self.tweetDictionary, word,groupIdStr,groupOriginalName)
 		orderedFreqKeywordTweetDict = frequentWordResult.returnDictionaryOfTweets()
 		groupList = frequentWordResult.returnFrequentWordsGroupList()
 
