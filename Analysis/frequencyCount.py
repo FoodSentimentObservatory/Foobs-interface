@@ -22,12 +22,29 @@ def frequencyCount(tweets, group):
         frequencyTuple = (str(count), words.lower())
         frequencyTupleStr = ' '.join(frequencyTuple)
         if count > 1:
-                    repeatedWordsTuple = (str(count), words.lower())
-                    repeatedWords.append(repeatedWordsTuple)
+                    repeatedWords.append(words.lower())
         else:
                     uniqueWords.append(words.lower())
+
+    repeatedWordsList=[]
+    #taking all the repeated words and checking how many tweets contain each
+    for repeatedWord in repeatedWords:
+        numberOfTweets = 0
+        for tweet in tweets:
+            alreadySeen=[]
+            #checking if a word appears in the tweet text, if it appears more than once, the
+            #count would still be 1, as we're only interested if it's in the tweet at all
+            #and not how many times it 
+            count = resultsFiltering.findWordInText(repeatedWord,alreadySeen, tweet[0])
+            numberOfTweets+=count
+        #checking again if the count is greater than 1, as it is possible that there might have been
+        #a tweet which contained a word twice, so it made it to the repeatedWords, however, the word
+        #appeared only in that tweet    
+        if numberOfTweets > 1:
+            repeatedWordsTuple = (str(numberOfTweets), repeatedWord)
+            repeatedWordsList.append(repeatedWordsTuple)
     print("Generated frequencies for current group") 
-    topTen=ignoreUniqueWords(repeatedWords, group)
+    topTen=ignoreUniqueWords(repeatedWordsList, group)
 
     return topTen 
 
@@ -44,7 +61,7 @@ def filterTexts(textList, nlp):
 def ignoreUniqueWords(repeatedWords, group):
     n=0
     topTen=[]
-    #removing the group keywords from that list because we clearly know they are frequent and select the top 10 remaining
+    #removing the group keywords from that list because we clearly know they are frequent and select the top 15 remaining
     for tup in repeatedWords:
         i=0
         for word in group:

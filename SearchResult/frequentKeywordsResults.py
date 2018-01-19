@@ -10,6 +10,7 @@ class FrequentKeywordsResult:
 		self.word = word
 		self.originalStringGroupId = groupIdStr
 		self.originalGroupName = groupOriginalName
+		
 		self.newGroups = []			
 
 	def splitIntoGroupList(self):		
@@ -29,11 +30,14 @@ class FrequentKeywordsResult:
 		cleanGroupList = self.splitIntoGroupList()		
 		#searching if a frequent word is in a tweet			
 		for freqWord in cleanGroupList:
+				originalGroupList = self.originalGroupName.split(",")
+				originalGroupList.append(freqWord)
 				for key, value in self.tweets.items():
 					for tweet in value:
 						alreadySeenWords=[]
-						count = resultsFiltering.findWordInText(freqWord, alreadySeenWords, tweet[0])
-						if count>0:
+						#checking if this frequent word and the original dataset words are present in the tweet
+						count = resultsFiltering.findKeywordsInText(tweet[0],originalGroupList)
+						if count==len(originalGroupList):
 							resultsFiltering.addTweetToNewGroupsList(freqWord,tweet,self.originalStringGroupId,self.newGroups)
 #main function to split the tweets in groups by frequent keyword
 	def returnDictionaryOfTweets(self):		
@@ -52,6 +56,7 @@ class FrequentKeywordsResult:
 			groupId=self.originalStringGroupId+key
 			groupString=self.originalGroupName+","+key
 			keywordGroupList = groupString.split(',')
+			print(keywordGroupList)
 			frequentWords = frequencyCount.frequencyCount(value,keywordGroupList)
 			numberOfTweets=len(value)
 
